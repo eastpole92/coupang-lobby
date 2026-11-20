@@ -129,6 +129,7 @@
                     <span class="px-2 py-0.5 bg-stone-100 rounded-md font-medium text-stone-700">WASD / 방향키</span> 이동
                     <span class="px-2 py-0.5 bg-stone-100 rounded-md font-medium text-stone-700">마우스 드래그</span> 시점 회전
                     <span class="px-2 py-0.5 bg-stone-100 rounded-md font-medium text-stone-700">휠</span> 확대/축소
+                    <span id="cloud-sync-badge" class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md font-medium">☁️ 실시간 동기화 중</span>
                 </div>
             </div>
 
@@ -175,16 +176,13 @@
         <div class="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
             <button id="toggle-pace-btn" class="bg-white/90 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-full px-4 py-2.5 shadow-lg border border-stone-200 flex items-center gap-2 text-xs sm:text-sm font-bold text-stone-800 cursor-pointer">
                 <span id="pace-icon" class="text-base">🚶</span>
-                <span id="pace-btn-text">느린 발걸음</span>
+                <span id="pace-btn-text">업무시간</span>
                 <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-700">전환</span>
             </button>
 
             <div class="flex gap-1.5">
                 <button id="reset-pos-btn" title="처음 위치로" class="bg-white/85 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-stone-200 text-xs font-semibold text-stone-700 cursor-pointer">
                     🏠 로비 중앙
-                </button>
-                <button id="camera-preset-btn" title="시점 각도 전환" class="bg-white/85 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-stone-200 text-xs font-semibold text-stone-700 cursor-pointer">
-                    🎥 시점 전환
                 </button>
             </div>
         </div>
@@ -211,16 +209,22 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         /**
          * ============================================================================
-         * 사내 로비 3D 탐방 프로토타입 (Three.js 단일 파일 구현)
-         * - 캐릭터: 하늘색 창모자, 하늘색 긴팔 맨투맨(남색 소매), 남색 바지, 흰 신발,
-         *           쿠팡 로고 & 헤드셋 없는 증명사진이 들어간 사원증 목걸이 착용
-         * - 공간: 통유리 채광 1층 로비, 카페 코너, 컬러 푸프 라운지, 디지털 안내 보드 & 키오스크,
-         *         쿠팡그룹 블라인드 게시판, 쿠팡굿즈샵, 당팡게시판
+         * 사내 로비 3D 탐방 프로토타입 (Three.js + 실시간 클라우드 저장 연동)
          * ============================================================================
          */
+
+        // 클라우드 데이터베이스 설정 및 상태
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-lobby-app';
 
         // 전역 변수 설정
         let scene, camera, renderer;
@@ -239,9 +243,8 @@
         };
 
         const PACE_MODES = [
-            { label: '느린 발걸음', speed: 3.4, bobFreq: 7.5, icon: '🚶' },
-            { label: '여유로운 산책', speed: 5.5, bobFreq: 10.5, icon: '👟' },
-            { label: '경쾌한 발걸음', speed: 8.2, bobFreq: 14.0, icon: '🏃' }
+            { label: '업무시간', speed: 3.4, bobFreq: 7.5, icon: '🚶' },
+            { label: '퇴근', speed: 8.2, bobFreq: 14.0, icon: '🏃' }
         ];
 
         // 카메라 궤도(Orbit) 제어 파라미터
@@ -253,8 +256,7 @@
             maxDistance: 16.0,
             isDragging: false,
             prevMouseX: 0,
-            prevMouseY: 0,
-            presetIndex: 0
+            prevMouseY: 0
         };
 
         // 입력 상태
@@ -613,6 +615,91 @@
             if (customTextures.mapBoard) customTextures.mapBoard.needsUpdate = true;
         }
 
+        // 클라우드 저장 및 실시간 동기화 초기화
+        async function initCloudStorage() {
+            const syncBadge = document.getElementById('cloud-sync-badge');
+            try {
+                if (typeof __firebase_config === 'undefined') {
+                    if (syncBadge) syncBadge.textContent = '⚠️ 오프라인 모드';
+                    return;
+                }
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const cred = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = cred.user;
+                } else {
+                    const cred = await signInAnonymously(auth);
+                    currentUser = cred.user;
+                }
+
+                if (!currentUser) return;
+
+                const sharedDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'lobby_boards', 'shared_state');
+                onSnapshot(sharedDocRef, (snapshot) => {
+                    if (!snapshot.exists()) {
+                        saveBoardDataToCloud();
+                        return;
+                    }
+                    const data = snapshot.data();
+                    if (Array.isArray(data.blind)) {
+                        boardData.blind = data.blind;
+                        redrawBlindBoard();
+                    }
+                    if (Array.isArray(data.dangpang)) {
+                        boardData.dangpang = data.dangpang;
+                        redrawDangpangBoard();
+                    }
+                    if (Array.isArray(data.couteria)) {
+                        data.couteria.forEach((savedCorner, idx) => {
+                            if (boardData.couteria[idx] && Array.isArray(savedCorner.items)) {
+                                boardData.couteria[idx].items = savedCorner.items;
+                            }
+                        });
+                        redrawCouTeriaMenu();
+                    }
+                    if (Array.isArray(data.globalStatus)) {
+                        data.globalStatus.forEach((savedCountry, idx) => {
+                            if (boardData.globalStatus[idx] && typeof savedCountry.summary === 'string') {
+                                boardData.globalStatus[idx].summary = savedCountry.summary;
+                            }
+                        });
+                        redrawGlobalBoard();
+                    }
+
+                    if (activeLandmarkId === 'blind' || activeLandmarkId === 'dangpang' || activeLandmarkId === 'couteria' || activeLandmarkId === 'board') {
+                        renderBoardPostList(activeLandmarkId);
+                    }
+                    if (syncBadge) syncBadge.textContent = '☁️ 저장 연동됨';
+                }, (error) => {
+                    console.error('게시판 데이터 동기화 오류:', error);
+                    if (syncBadge) syncBadge.textContent = '⚠️ 동기화 지연';
+                });
+            } catch (err) {
+                console.error('클라우드 초기화 오류:', err);
+                if (syncBadge) syncBadge.textContent = '⚠️ 연결 실패';
+            }
+        }
+
+        async function saveBoardDataToCloud() {
+            if (!db || !currentUser) return;
+            try {
+                const sharedDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'lobby_boards', 'shared_state');
+                await setDoc(sharedDocRef, {
+                    blind: boardData.blind,
+                    dangpang: boardData.dangpang,
+                    couteria: boardData.couteria.map(c => ({ title: c.title, items: c.items })),
+                    globalStatus: boardData.globalStatus.map(g => ({ country: g.country, summary: g.summary })),
+                    updatedAt: Date.now()
+                }, { merge: true });
+            } catch (err) {
+                console.error('게시판 저장 오류:', err);
+            }
+        }
+
         // 초기화 실행
         window.onload = function () {
             try {
@@ -624,6 +711,7 @@
                 spawnNPCCoworkers();
                 setupLandmarks();
                 setupInputsAndUI();
+                initCloudStorage();
                 animate();
             } catch (err) {
                 console.error('3D 로비 초기화 중 오류 발생:', err);
@@ -1830,7 +1918,8 @@
                     boardData.couteria[cIdx].items.splice(mIdx, 1);
                     redrawCouTeriaMenu();
                     renderBoardPostList('couteria');
-                    feedbackEl.textContent = '메뉴가 삭제되었습니다.';
+                    saveBoardDataToCloud();
+                    feedbackEl.textContent = '메뉴가 삭제 및 저장되었습니다.';
                     feedbackEl.className = 'text-[11px] font-medium text-emerald-700';
                     setTimeout(() => { feedbackEl.textContent = ''; }, 2000);
                 } else {
@@ -1855,8 +1944,9 @@
                         targetItem.summary = summaryText;
                         redrawGlobalBoard();
                         renderBoardPostList('board');
+                        saveBoardDataToCloud();
                     }
-                    feedbackEl.textContent = `${selectedCountry} 현황이 한 줄로 수정되었습니다!`;
+                    feedbackEl.textContent = `${selectedCountry} 현황이 저장되었습니다!`;
                     feedbackEl.className = 'text-[11px] font-medium text-emerald-700';
                     setTimeout(() => {
                         feedbackEl.textContent = '';
@@ -1877,9 +1967,10 @@
                         targetCorner.items.unshift(menuName);
                         redrawCouTeriaMenu();
                         renderBoardPostList('couteria');
+                        saveBoardDataToCloud();
                     }
                     msgInput.value = '';
-                    feedbackEl.textContent = '오늘의 식단표에 메뉴가 반영되었습니다!';
+                    feedbackEl.textContent = '오늘의 식단표에 저장되었습니다!';
                     feedbackEl.className = 'text-[11px] font-medium text-emerald-700';
                     setTimeout(() => {
                         feedbackEl.textContent = '';
@@ -1899,14 +1990,16 @@
                     boardData.blind.unshift({ nick, msg });
                     redrawBlindBoard();
                     renderBoardPostList('blind');
+                    saveBoardDataToCloud();
                 } else if (activeLandmarkId === 'dangpang') {
                     boardData.dangpang.unshift({ nick, msg });
                     redrawDangpangBoard();
                     renderBoardPostList('dangpang');
+                    saveBoardDataToCloud();
                 }
 
                 msgInput.value = '';
-                feedbackEl.textContent = '게시판에 반영되었습니다!';
+                feedbackEl.textContent = '게시판에 영구 저장되었습니다!';
                 feedbackEl.className = 'text-[11px] font-medium text-emerald-700';
                 setTimeout(() => {
                     feedbackEl.textContent = '';
@@ -2015,7 +2108,7 @@
             }, { passive: true });
             joyZone.addEventListener('touchend', resetJoystick);
 
-            // 발걸음 속도 토글 버튼 ('느린 발걸음' <-> '여유로운 산책' <-> '경쾌한 발걸음')
+            // 발걸음 속도 토글 버튼 ('업무시간' <-> '퇴근')
             const paceBtn = document.getElementById('toggle-pace-btn');
             paceBtn.addEventListener('click', () => {
                 playerState.paceIndex = (playerState.paceIndex + 1) % PACE_MODES.length;
@@ -2028,17 +2121,8 @@
                 playerState.position.set(0, 0, 4);
                 playerState.rotationY = Math.PI;
                 cameraControl.yaw = 0;
-            });
-
-            const presets = [
-                { pitch: 0.32, dist: 7.5 },
-                { pitch: 0.65, dist: 11.5 },
-                { pitch: 0.18, dist: 5.0 }
-            ];
-            document.getElementById('camera-preset-btn').addEventListener('click', () => {
-                cameraControl.presetIndex = (cameraControl.presetIndex + 1) % presets.length;
-                cameraControl.pitch = presets[cameraControl.presetIndex].pitch;
-                cameraControl.distance = presets[cameraControl.presetIndex].dist;
+                cameraControl.pitch = 0.32;
+                cameraControl.distance = 7.5;
             });
         }
 
