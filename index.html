@@ -205,7 +205,7 @@
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span>컬러 푸프 라운지</span>
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>디지털 현황 보드</span>
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span>쿠팡그룹 블라인드</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-pink-500"></span>쿠팡굿즈샵 · 당팡게시판</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-pink-500"></span>쿠썸게시판 · 굿즈샵</span>
         </div>
     </div>
 
@@ -284,6 +284,12 @@
                 { nick: '칭찬봇', msg: '동료들의 빠른 피드백 감사해요' },
                 { nick: '산책러', msg: '점심 산책 같이 가실 분?' }
             ],
+            cousome: [
+                { nick: '쿠카페단골', msg: '매일 9시 쿠카페서 마주치는 분 커피 한잔해요 💕' },
+                { nick: '로켓설렘', msg: '엘리베이터에서 사원증 주워주신 분 감사합니다 ☺️' },
+                { nick: '점심산책', msg: '푸프 라운지 창가 자리 노란 니트분 멋져요 ✨' },
+                { nick: '비밀짝사랑', msg: '오늘 퇴근길에 용기 내서 말 걸어볼까요? 💌' }
+            ],
             couteria: [
                 {
                     title: '육식',
@@ -321,7 +327,7 @@
                 }
             ]
         };
-        let blindCanvas, blindCtx, dangpangCanvas, dangpangCtx, menuCanvas, menuCtx, globalCanvas, globalCtx;
+        let blindCanvas, blindCtx, dangpangCanvas, dangpangCtx, cousomeCanvas, cousomeCtx, menuCanvas, menuCtx, globalCanvas, globalCtx;
 
         function escapeHtml(str) {
             return String(str)
@@ -366,12 +372,15 @@
                 return;
             }
 
-            const posts = boardId === 'blind' ? boardData.blind : boardData.dangpang;
+            const posts = boardId === 'blind'
+                ? boardData.blind
+                : (boardId === 'cousome' ? boardData.cousome : boardData.dangpang);
             const isBlind = boardId === 'blind';
+            const isCousome = boardId === 'cousome';
 
             listEl.innerHTML = posts.map(item => `
-                <div class="${isBlind ? 'bg-amber-50/95 border-amber-200' : 'bg-rose-50/95 border-rose-200'} border rounded-xl px-2.5 py-1.5 shadow-sm">
-                    <div class="text-[11px] font-bold ${isBlind ? 'text-amber-800' : 'text-rose-700'}">@${escapeHtml(item.nick)}</div>
+                <div class="${isBlind ? 'bg-amber-50/95 border-amber-200' : (isCousome ? 'bg-pink-50/95 border-pink-200' : 'bg-rose-50/95 border-rose-200')} border rounded-xl px-2.5 py-1.5 shadow-sm">
+                    <div class="text-[11px] font-bold ${isBlind ? 'text-amber-800' : (isCousome ? 'text-pink-700' : 'text-rose-700')}">@${escapeHtml(item.nick)}</div>
                     <div class="text-xs text-slate-800 leading-snug mt-0.5 break-words">${escapeHtml(item.msg)}</div>
                 </div>
             `).join('');
@@ -456,6 +465,72 @@
                 dpCtx.fillText(item.msg, x + 20, y + 98, 306);
             });
             if (customTextures.dangpangBoard) customTextures.dangpangBoard.needsUpdate = true;
+        }
+
+        function redrawCousomeBoard() {
+            if (!cousomeCtx) return;
+            const csCtx = cousomeCtx;
+            const W = cousomeCanvas.width;
+            const H = cousomeCanvas.height;
+
+            // 로맨틱 파스텔 핑크 배경 & 테두리
+            const bgGrad = csCtx.createLinearGradient(0, 0, W, H);
+            bgGrad.addColorStop(0, '#fdf2f8');
+            bgGrad.addColorStop(1, '#fce7f3');
+            csCtx.fillStyle = bgGrad;
+            csCtx.fillRect(0, 0, W, H);
+
+            csCtx.strokeStyle = '#ec4899';
+            csCtx.lineWidth = 10;
+            csCtx.strokeRect(8, 8, W - 16, H - 16);
+
+            // 상단 타이틀 바
+            csCtx.fillStyle = '#db2777';
+            csCtx.beginPath();
+            csCtx.roundRect(22, 20, W - 44, 68, 14);
+            csCtx.fill();
+
+            csCtx.fillStyle = '#ffffff';
+            csCtx.font = 'bold 33px "Noto Sans KR", sans-serif';
+            csCtx.textAlign = 'center';
+            csCtx.textBaseline = 'middle';
+            csCtx.fillText('💕 쿠썸게시판 · 사내 설렘 시그널 💕', W / 2, 54);
+
+            const cardStyles = [
+                { bg: '#ffffff', border: '#f9a8d4', fg: '#be185d' },
+                { bg: '#fff1f2', border: '#fda4af', fg: '#e11d48' },
+                { bg: '#faf5ff', border: '#d8b4fe', fg: '#7e22ce' },
+                { bg: '#fff7ed', border: '#fdba74', fg: '#c2410c' }
+            ];
+
+            boardData.cousome.slice(0, 4).forEach((item, i) => {
+                const col = i % 2;
+                const row = Math.floor(i / 2);
+                const x = 32 + col * 366;
+                const y = 108 + row * 184;
+                const st = cardStyles[i % cardStyles.length];
+
+                csCtx.fillStyle = st.bg;
+                csCtx.beginPath();
+                csCtx.roundRect(x, y, 346, 164, 16);
+                csCtx.fill();
+
+                csCtx.strokeStyle = st.border;
+                csCtx.lineWidth = 3;
+                csCtx.stroke();
+
+                csCtx.fillStyle = st.fg;
+                csCtx.font = 'bold 22px "Noto Sans KR", sans-serif';
+                csCtx.textAlign = 'left';
+                csCtx.textBaseline = 'alphabetic';
+                csCtx.fillText(`💌 @${item.nick}`, x + 20, y + 46);
+
+                csCtx.fillStyle = '#1e293b';
+                csCtx.font = '600 20px "Noto Sans KR", sans-serif';
+                csCtx.fillText(item.msg, x + 20, y + 98, 306);
+            });
+
+            if (customTextures.cousomeBoard) customTextures.cousomeBoard.needsUpdate = true;
         }
 
         function redrawCouTeriaMenu() {
@@ -627,6 +702,10 @@
                 boardData.dangpang = data.dangpang;
                 redrawDangpangBoard();
             }
+            if (Array.isArray(data.cousome)) {
+                boardData.cousome = data.cousome;
+                redrawCousomeBoard();
+            }
             if (Array.isArray(data.couteria)) {
                 data.couteria.forEach((savedCorner, idx) => {
                     if (boardData.couteria[idx] && Array.isArray(savedCorner.items)) {
@@ -643,7 +722,7 @@
                 });
                 redrawGlobalBoard();
             }
-            if (activeLandmarkId === 'blind' || activeLandmarkId === 'dangpang' || activeLandmarkId === 'couteria' || activeLandmarkId === 'board') {
+            if (activeLandmarkId === 'blind' || activeLandmarkId === 'dangpang' || activeLandmarkId === 'cousome' || activeLandmarkId === 'couteria' || activeLandmarkId === 'board') {
                 renderBoardPostList(activeLandmarkId);
             }
         }
@@ -666,6 +745,7 @@
                 const payload = {
                     blind: boardData.blind,
                     dangpang: boardData.dangpang,
+                    cousome: boardData.cousome,
                     couteria: boardData.couteria.map(c => ({ title: c.title, items: c.items })),
                     globalStatus: boardData.globalStatus.map(g => ({ country: g.country, summary: g.summary })),
                     updatedAt: Date.now()
@@ -748,6 +828,7 @@
                 await setDoc(sharedDocRef, {
                     blind: boardData.blind,
                     dangpang: boardData.dangpang,
+                    cousome: boardData.cousome,
                     couteria: boardData.couteria.map(c => ({ title: c.title, items: c.items })),
                     globalStatus: boardData.globalStatus.map(g => ({ country: g.country, summary: g.summary })),
                     updatedAt: Date.now()
@@ -948,6 +1029,15 @@
             customTextures.dangpangBoard.encoding = THREE.sRGBEncoding;
             redrawDangpangBoard();
 
+            // (F-2) 쿠썸게시판 텍스처
+            cousomeCanvas = document.createElement('canvas');
+            cousomeCanvas.width = 768;
+            cousomeCanvas.height = 512;
+            cousomeCtx = cousomeCanvas.getContext('2d');
+            customTextures.cousomeBoard = new THREE.CanvasTexture(cousomeCanvas);
+            customTextures.cousomeBoard.encoding = THREE.sRGBEncoding;
+            redrawCousomeBoard();
+
             // (G) 쿠팡굿즈샵 간판 텍스처
             const goodsSignCanvas = document.createElement('canvas');
             goodsSignCanvas.width = 512;
@@ -1091,113 +1181,184 @@
             floorMesh.receiveShadow = true;
             lobbyGroup.add(floorMesh);
 
-            // 중앙 라운지 원형 러그
-            const centerRug = new THREE.Mesh(
-                new THREE.CylinderGeometry(3.4, 3.4, 0.02, 48),
-                new THREE.MeshStandardMaterial({ color: 0xdfd8cc, roughness: 0.9 })
-            );
-            centerRug.position.set(0, 0.01, 2.2);
-            centerRug.receiveShadow = true;
-            lobbyGroup.add(centerRug);
-
-            // 우드 슬랫 천장
-            const ceilingMesh = new THREE.Mesh(
-                new THREE.PlaneGeometry(27, 27),
-                new THREE.MeshStandardMaterial({ map: customTextures.woodSlat, roughness: 0.65 })
-            );
-            ceilingMesh.rotation.x = Math.PI / 2;
-            ceilingMesh.position.y = 8.2;
-            lobbyGroup.add(ceilingMesh);
-
-            // 외벽 재질
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.85 });
-            const trimMat = new THREE.MeshStandardMaterial({ color: 0xd6cfc3, roughness: 0.7 });
-
-            // 북쪽 벽면 (z = -13.5)
-            const northWall = new THREE.Mesh(new THREE.BoxGeometry(27, 8.2, 0.4), wallMat);
-            northWall.position.set(0, 4.1, -13.5);
-            northWall.receiveShadow = true;
-            lobbyGroup.add(northWall);
-
-            // 남쪽 벽면 (z = +13.5)
-            const southWall = new THREE.Mesh(new THREE.BoxGeometry(27, 8.2, 0.4), wallMat);
-            southWall.position.set(0, 4.1, 13.5);
-            southWall.receiveShadow = true;
-            lobbyGroup.add(southWall);
-
-            // 우측(동쪽) 벽면 (x = +13.5)
-            const eastWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 8.2, 27), wallMat);
-            eastWall.position.set(13.5, 4.1, 0);
-            eastWall.receiveShadow = true;
-            lobbyGroup.add(eastWall);
-
-            // 좌측(서쪽) 채광 통유리창 프레임 & 유리 (x = -13.5)
+            // 경계선 벽면 & 통유리창 프레임
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0xf5f2eb, roughness: 0.85 });
             const glassMat = new THREE.MeshPhysicalMaterial({
                 color: 0xe0f2fe,
                 transparent: true,
-                opacity: 0.28,
+                opacity: 0.35,
                 roughness: 0.1
             });
-            const westGlass = new THREE.Mesh(new THREE.PlaneGeometry(26.6, 7.6), glassMat);
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.5, roughness: 0.4 });
+
+            // 북쪽 벽면 (z = -13.5)
+            const northWall = new THREE.Mesh(new THREE.BoxGeometry(27, 9.5, 0.35), wallMat);
+            northWall.position.set(0, 4.75, -13.5);
+            northWall.receiveShadow = true;
+            lobbyGroup.add(northWall);
+
+            // 동쪽 벽면 (x = 13.5)
+            const eastWall = new THREE.Mesh(new THREE.BoxGeometry(0.35, 9.5, 27), wallMat);
+            eastWall.position.set(13.5, 4.75, 0);
+            eastWall.receiveShadow = true;
+            lobbyGroup.add(eastWall);
+
+            // 서쪽 통유리창 벽면 (x = -13.5)
+            const westGlass = new THREE.Mesh(new THREE.PlaneGeometry(27, 9.2), glassMat);
             westGlass.rotation.y = Math.PI / 2;
-            westGlass.position.set(-13.35, 4.0, 0);
+            westGlass.position.set(-13.45, 4.6, 0);
             lobbyGroup.add(westGlass);
 
             for (let z = -12; z <= 12; z += 4) {
-                const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.24, 8.2, 0.22), trimMat);
-                mullion.position.set(-13.4, 4.1, z);
+                const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.18, 9.5, 0.18), frameMat);
+                mullion.position.set(-13.4, 4.75, z);
                 lobbyGroup.add(mullion);
             }
 
-            // 외곽 벽 충돌 경계 등록
-            addCollider(-14.2, 14.2, -14.2, -13.1, 0, 8.2);
-            addCollider(-14.2, 14.2, 13.1, 14.2, 0, 8.2);
-            addCollider(13.1, 14.2, -14.2, 14.2, 0, 8.2);
-            addCollider(-14.2, -13.1, -14.2, 14.2, 0, 8.2);
+            // 남쪽 통유리창 입구 벽면 (z = 13.5)
+            const southGlass = new THREE.Mesh(new THREE.PlaneGeometry(27, 9.2), glassMat);
+            southGlass.rotation.y = Math.PI;
+            southGlass.position.set(0, 4.6, 13.45);
+            lobbyGroup.add(southGlass);
+
+            for (let x = -12; x <= 12; x += 4.5) {
+                const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.18, 9.5, 0.18), frameMat);
+                mullion.position.set(x, 4.75, 13.4);
+                lobbyGroup.add(mullion);
+            }
+
+            // 우드 슬랫 천장 (y = 9.5)
+            const ceilingMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(27, 27),
+                new THREE.MeshStandardMaterial({ map: customTextures.woodSlat, roughness: 0.72 })
+            );
+            ceilingMesh.rotation.x = Math.PI / 2;
+            ceilingMesh.position.y = 9.5;
+            lobbyGroup.add(ceilingMesh);
 
             scene.add(lobbyGroup);
         }
 
         /**
-         * 4. 로비 가구, 커피차, 보드, 굿즈샵, 게시판 배치
+         * 4. 가구, 쿠카페 트럭, 게시판, 로켓 조형물 등 로비 소품 배치
          */
         function buildFurnitureAndProps() {
             const propsGroup = new THREE.Group();
-            const oakMat = new THREE.MeshStandardMaterial({ color: 0xc29363, roughness: 0.58 });
-            const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.45, metalness: 0.35 });
+            const oakMat = new THREE.MeshStandardMaterial({ color: 0xb9895b, roughness: 0.6 });
+            const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.45, roughness: 0.45 });
 
-            // --- (1) 좌측 쿠카페 바 카운터 & 에스프레소 존 ---
-            const cafeCounter = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.05, 5.2), oakMat);
-            cafeCounter.position.set(-11.4, 0.525, -1.2);
-            cafeCounter.castShadow = true;
-            cafeCounter.receiveShadow = true;
-            propsGroup.add(cafeCounter);
-            addCollider(-12.3, -10.5, -4.0, 1.6, 0, 2);
+            // --- (1) 좌측 쿠카페 카페트럭 & 바리스타 존 ---
+            const cafeTruck = new THREE.Group();
+            cafeTruck.position.set(-11.3, 0, -1.2);
 
-            const cafeBackCounter = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.0, 5.2), oakMat);
-            cafeBackCounter.position.set(-12.7, 0.5, -1.2);
-            propsGroup.add(cafeBackCounter);
+            const truckBodyMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.45 });
+            const truckTrimMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 });
+            const tireMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85 });
+            const hubMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.6, roughness: 0.3 });
+
+            // 트럭 하부 섀시 & 바퀴 4개
+            const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.25, 5.4), darkMetalMat);
+            chassis.position.set(0, 0.42, 0);
+            chassis.castShadow = true;
+            cafeTruck.add(chassis);
+
+            [[-0.95, 1.75], [0.95, 1.75], [-0.95, -1.75], [0.95, -1.75]].forEach(([wx, wz]) => {
+                const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.26, 20), tireMat);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(wx, 0.36, wz);
+                wheel.castShadow = true;
+                const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.28, 14), hubMat);
+                hub.rotation.z = Math.PI / 2;
+                hub.position.set(wx, 0.36, wz);
+                cafeTruck.add(wheel, hub);
+            });
+
+            // 앞쪽 운전석 캡 (남쪽 방향 z = +2.0)
+            const cabLower = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.95, 1.35), truckTrimMat);
+            cabLower.position.set(0, 1.0, 2.05);
+            cabLower.castShadow = true;
+            const cabUpper = new THREE.Mesh(new THREE.BoxGeometry(1.98, 0.85, 1.15), truckBodyMat);
+            cabUpper.position.set(0, 1.88, 1.95);
+            cabUpper.castShadow = true;
+            const windshield = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.75, 0.65),
+                new THREE.MeshPhysicalMaterial({ color: 0xe0f2fe, transparent: true, opacity: 0.55, roughness: 0.1 })
+            );
+            windshield.position.set(0, 1.9, 2.54);
+            const headlightL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.08, 12), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+            headlightL.rotation.x = Math.PI / 2;
+            headlightL.position.set(-0.68, 0.85, 2.74);
+            const headlightR = headlightL.clone();
+            headlightR.position.x = 0.68;
+            cafeTruck.add(cabLower, cabUpper, windshield, headlightL, headlightR);
+
+            // 뒤쪽 카페 바디 (하단 서빙 카운터 + 좌/후면 벽 + 지붕)
+            const lowerBox = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.95, 4.0), truckBodyMat);
+            lowerBox.position.set(0, 1.0, -0.65);
+            lowerBox.castShadow = true;
+            lowerBox.receiveShadow = true;
+            const stripeBand = new THREE.Mesh(new THREE.BoxGeometry(2.14, 0.22, 4.04), truckTrimMat);
+            stripeBand.position.set(0, 0.65, -0.65);
+            cafeTruck.add(lowerBox, stripeBand);
+
+            // 서빙 카운터 상판 (로비 쪽 x = +1.05 돌출)
+            const servingCounter = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.08, 3.6), oakMat);
+            servingCounter.position.set(1.12, 1.48, -0.65);
+            servingCounter.castShadow = true;
+            cafeTruck.add(servingCounter);
+
+            // 트럭 뒤벽 & 왼쪽 벽 & 기둥 & 지붕
+            const backWall = new THREE.Mesh(new THREE.BoxGeometry(2.1, 1.35, 0.16), truckBodyMat);
+            backWall.position.set(0, 2.15, -2.57);
+            const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.35, 4.0), truckBodyMat);
+            leftWall.position.set(-0.97, 2.15, -0.65);
+            const frontPillarR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.35, 0.22), truckBodyMat);
+            frontPillarR.position.set(0.97, 2.15, 1.24);
+            const roofBox = new THREE.Mesh(new THREE.BoxGeometry(2.22, 0.24, 4.18), truckBodyMat);
+            roofBox.position.set(0, 2.92, -0.65);
+            roofBox.castShadow = true;
+            cafeTruck.add(backWall, leftWall, frontPillarR, roofBox);
+
+            // 스트라이프 차양막 (어닝)
+            const awning = new THREE.Mesh(
+                new THREE.BoxGeometry(0.75, 0.06, 3.55),
+                new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.5 })
+            );
+            awning.position.set(1.32, 2.66, -0.65);
+            awning.rotation.z = -0.28;
+            awning.castShadow = true;
+            cafeTruck.add(awning);
+
+            // 트럭 내부 작업대 & 에스프레소 머신 & 메뉴 컵
+            const innerWorktop = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.08, 3.5), oakMat);
+            innerWorktop.position.set(-0.52, 1.48, -0.65);
+            cafeTruck.add(innerWorktop);
 
             const espressoMachine = new THREE.Mesh(
-                new THREE.BoxGeometry(0.55, 0.55, 0.75),
+                new THREE.BoxGeometry(0.48, 0.46, 0.65),
                 new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.7, roughness: 0.25 })
             );
-            espressoMachine.position.set(-12.65, 1.28, -1.8);
+            espressoMachine.position.set(-0.55, 1.75, -1.45);
             espressoMachine.castShadow = true;
-            propsGroup.add(espressoMachine);
+            cafeTruck.add(espressoMachine);
 
+            const takeOutCup = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.065, 0.05, 0.16, 12),
+                new THREE.MeshStandardMaterial({ color: 0xffffff })
+            );
+            takeOutCup.position.set(1.08, 1.6, -0.15);
+            cafeTruck.add(takeOutCup);
+
+            // 트럭 루프 상단 쿠카페 간판
             const signBoard = new THREE.Mesh(
-                new THREE.BoxGeometry(0.12, 0.75, 3.0),
+                new THREE.BoxGeometry(0.14, 0.72, 2.9),
                 new THREE.MeshStandardMaterial({ map: customTextures.cafeSign })
             );
-            signBoard.position.set(-11.4, 3.1, -1.2);
-            propsGroup.add(signBoard);
+            signBoard.position.set(0.35, 3.4, -0.65);
+            cafeTruck.add(signBoard);
 
-            [-2.2, -0.2].forEach(zPos => {
-                const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 1.8), darkMetalMat);
-                wire.position.set(-11.4, 4.3, zPos);
-                propsGroup.add(wire);
-            });
+            propsGroup.add(cafeTruck);
+            addCollider(-12.5, -9.9, -4.0, 1.6, 0, 3.6);
 
             const tableX = -7.8, tableZ = 1.6;
             const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.1, 3.6), oakMat);
@@ -1470,6 +1631,63 @@
             propsGroup.add(dangpangGroup);
             addCollider(0.85, 4.75, 9.2, 10.0, 0, 3.4);
 
+            // --- (4-D2) 주인공이 처음 바라보는 정면 앞(z = -1.6) 쿠썸게시판 (사내연애썸 게시판) ---
+            const cousomeGroup = new THREE.Group();
+            cousomeGroup.position.set(0, 0, -1.6);
+
+            const csFrameMat = new THREE.MeshStandardMaterial({ color: 0xdb2777, roughness: 0.4, metalness: 0.2 });
+            const csFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(3.35, 2.25, 0.14),
+                csFrameMat
+            );
+            csFrame.position.set(0, 1.85, 0);
+            csFrame.castShadow = true;
+            cousomeGroup.add(csFrame);
+
+            const csMat = new THREE.MeshBasicMaterial({ map: customTextures.cousomeBoard });
+            // 주인공이 시작 위치(0, 0, 4)에서 북쪽(-z)을 바라볼 때 바로 마주보는 앞면(+z 방향)
+            const csFront = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.1), csMat);
+            csFront.position.set(0, 1.85, 0.08);
+            const csBack = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.1), csMat);
+            csBack.position.set(0, 1.85, -0.08);
+            csBack.rotation.y = Math.PI;
+            cousomeGroup.add(csFront, csBack);
+
+            // 상단 입체 하트 장식 포인트
+            const heartShape = new THREE.Shape();
+            heartShape.moveTo(0, 0.12);
+            heartShape.bezierCurveTo(0, 0.22, -0.18, 0.28, -0.22, 0.14);
+            heartShape.bezierCurveTo(-0.26, 0.0, -0.1, -0.12, 0, -0.24);
+            heartShape.bezierCurveTo(0.1, -0.12, 0.26, 0.0, 0.22, 0.14);
+            heartShape.bezierCurveTo(0.18, 0.28, 0, 0.22, 0, 0.12);
+            const heartGeo = new THREE.ExtrudeGeometry(heartShape, {
+                depth: 0.08,
+                bevelEnabled: true,
+                bevelThickness: 0.02,
+                bevelSize: 0.02,
+                bevelSegments: 2
+            });
+            const heartBadge = new THREE.Mesh(
+                heartGeo,
+                new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xe11d48, emissiveIntensity: 0.25, roughness: 0.3 })
+            );
+            heartBadge.position.set(0, 3.16, -0.04);
+            cousomeGroup.add(heartBadge);
+
+            [-1.45, 1.45].forEach((lx) => {
+                const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.95, 0.18), csFrameMat);
+                post.position.set(lx, 1.475, 0);
+                post.castShadow = true;
+                cousomeGroup.add(post);
+
+                const baseFoot = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.08, 16), darkMetalMat);
+                baseFoot.position.set(lx, 0.04, 0);
+                cousomeGroup.add(baseFoot);
+            });
+
+            propsGroup.add(cousomeGroup);
+            addCollider(-1.72, 1.72, -1.9, -1.3, 0, 3.1);
+
             // --- (4-E) 북쪽 벽면 쿠테리아 식단표 보드 ---
             const menuBoardGroup = new THREE.Group();
             menuBoardGroup.position.set(4.5, 2.35, -13.15);
@@ -1489,6 +1707,165 @@
             menuBoardGroup.add(menuScreen);
 
             propsGroup.add(menuBoardGroup);
+
+            // --- (4-F) 쿠카페 트럭 뒤 서쪽 벽면 대형 쿠팡 로켓 월 디자인 조형물 ---
+            const rocketWallArtGroup = new THREE.Group();
+            rocketWallArtGroup.position.set(-13.2, 0, -1.2);
+            rocketWallArtGroup.rotation.y = Math.PI / 2;
+
+            // 벽면 LED 간접조명 프레임 (쿠카페 트럭 뒤 배경)
+            const neonFrameMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb });
+            const frameTop = new THREE.Mesh(new THREE.BoxGeometry(6.4, 0.12, 0.16), neonFrameMat);
+            frameTop.position.set(0, 7.6, -0.05);
+            const frameLeft = new THREE.Mesh(new THREE.BoxGeometry(0.12, 7.6, 0.16), neonFrameMat);
+            frameLeft.position.set(-3.14, 3.8, -0.05);
+            const frameRight = new THREE.Mesh(new THREE.BoxGeometry(0.12, 7.6, 0.16), neonFrameMat);
+            frameRight.position.set(3.14, 3.8, -0.05);
+            rocketWallArtGroup.add(frameTop, frameLeft, frameRight);
+
+            // 벽면 하단 coupang 로고 백라이트 보드 (트럭 지붕 위 시야에 보이도록 배치)
+            const stageSignCanvas = document.createElement('canvas');
+            stageSignCanvas.width = 512;
+            stageSignCanvas.height = 96;
+            const stCtx = stageSignCanvas.getContext('2d');
+            stCtx.fillStyle = 'rgba(248, 250, 252, 0.92)';
+            stCtx.fillRect(0, 0, 512, 96);
+            stCtx.font = 'bold 54px Arial, sans-serif';
+            stCtx.textAlign = 'left';
+            stCtx.textBaseline = 'middle';
+            const stLogo = [
+                { text: 'coup', color: '#4a2c18' },
+                { text: 'a', color: '#e53935' },
+                { text: 'n', color: '#eab308' },
+                { text: 'g', color: '#16a34a' }
+            ];
+            let stW = 0;
+            stLogo.forEach(p => { stW += stCtx.measureText(p.text).width; });
+            let stX = (512 - stW) / 2;
+            stLogo.forEach(p => {
+                stCtx.fillStyle = p.color;
+                stCtx.fillText(p.text, stX, 48);
+                stX += stCtx.measureText(p.text).width;
+            });
+            const stageSignTex = new THREE.CanvasTexture(stageSignCanvas);
+            stageSignTex.encoding = THREE.sRGBEncoding;
+
+            const stageSign = new THREE.Mesh(
+                new THREE.PlaneGeometry(3.6, 0.68),
+                new THREE.MeshBasicMaterial({ map: stageSignTex })
+            );
+            stageSign.position.set(0.85, 3.7, 0.05);
+            rocketWallArtGroup.add(stageSign);
+
+            // 벽면에 입체 부조(Relief) 형태로 부착된 대각선 쿠팡 로켓 디자인
+            const rocketSculpture = new THREE.Group();
+            rocketSculpture.position.set(-0.25, 5.45, 0.16);
+            rocketSculpture.rotation.z = -0.64; // 우상단 대각선 각도
+            rocketSculpture.scale.set(0.88, 0.88, 0.36); // 벽면 부착 부조 비율
+
+            // 유선형 로켓 동체 (LatheGeometry)
+            const bodyPoints = [
+                new THREE.Vector2(0.0, -1.55),
+                new THREE.Vector2(0.36, -1.45),
+                new THREE.Vector2(0.58, -1.05),
+                new THREE.Vector2(0.74, -0.35),
+                new THREE.Vector2(0.76, 0.35),
+                new THREE.Vector2(0.62, 1.05),
+                new THREE.Vector2(0.32, 1.62),
+                new THREE.Vector2(0.0, 2.02)
+            ];
+            const rocketHullGeo = new THREE.LatheGeometry(bodyPoints, 36);
+            const rocketHullMat = new THREE.MeshStandardMaterial({
+                color: 0x7dd3fc,
+                emissive: 0x0284c7,
+                emissiveIntensity: 0.25,
+                roughness: 0.3,
+                metalness: 0.15
+            });
+            const rocketHull = new THREE.Mesh(rocketHullGeo, rocketHullMat);
+            rocketHull.castShadow = true;
+            rocketSculpture.add(rocketHull);
+
+            // 중앙 원형 창문 (Porthole)
+            const windowFrame = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.34, 0.34, 0.14, 28),
+                new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
+            );
+            windowFrame.rotation.x = Math.PI / 2;
+            windowFrame.position.set(0, 0.45, 0.68);
+            const windowGlass = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.27, 0.27, 0.16, 28),
+                new THREE.MeshStandardMaterial({ color: 0xe0f2fe, emissive: 0xbae6fd, emissiveIntensity: 0.4, roughness: 0.15 })
+            );
+            windowGlass.rotation.x = Math.PI / 2;
+            windowGlass.position.set(0, 0.45, 0.69);
+            rocketSculpture.add(windowFrame, windowGlass);
+
+            // 좌우 및 전면 날개 핀 (3개)
+            const finMat = new THREE.MeshStandardMaterial({
+                color: 0x0284c7,
+                emissive: 0x0369a1,
+                emissiveIntensity: 0.22,
+                roughness: 0.35
+            });
+            const finShape = new THREE.Shape();
+            finShape.moveTo(0, 0);
+            finShape.quadraticCurveTo(0.68, -0.15, 0.72, -0.95);
+            finShape.quadraticCurveTo(0.45, -0.75, 0.05, -0.58);
+            finShape.closePath();
+
+            const finGeo = new THREE.ExtrudeGeometry(finShape, {
+                depth: 0.12,
+                bevelEnabled: true,
+                bevelThickness: 0.03,
+                bevelSize: 0.03,
+                bevelSegments: 3
+            });
+
+            const leftFin = new THREE.Mesh(finGeo, finMat);
+            leftFin.position.set(-0.56, -0.72, -0.06);
+            leftFin.scale.x = -1;
+            leftFin.castShadow = true;
+
+            const rightFin = new THREE.Mesh(finGeo, finMat);
+            rightFin.position.set(0.56, -0.72, -0.06);
+            rightFin.castShadow = true;
+
+            const frontFin = new THREE.Mesh(finGeo, finMat);
+            frontFin.position.set(0, -0.78, 0.56);
+            frontFin.rotation.y = -Math.PI / 2;
+            frontFin.castShadow = true;
+
+            rocketSculpture.add(leftFin, rightFin, frontFin);
+
+            // 분사 불꽃 조형물
+            const flameOuter = new THREE.Mesh(
+                new THREE.ConeGeometry(0.42, 1.05, 24),
+                new THREE.MeshStandardMaterial({
+                    color: 0xf97316,
+                    emissive: 0xea580c,
+                    emissiveIntensity: 0.55,
+                    roughness: 0.35
+                })
+            );
+            flameOuter.rotation.x = Math.PI;
+            flameOuter.position.set(0, -2.02, 0);
+
+            const flameInner = new THREE.Mesh(
+                new THREE.SphereGeometry(0.32, 18, 18),
+                new THREE.MeshStandardMaterial({
+                    color: 0xfacc15,
+                    emissive: 0xf59e0b,
+                    emissiveIntensity: 0.65,
+                    roughness: 0.3
+                })
+            );
+            flameInner.scale.set(1, 1.35, 1);
+            flameInner.position.set(0, -1.78, 0);
+            rocketSculpture.add(flameOuter, flameInner);
+
+            rocketWallArtGroup.add(rocketSculpture);
+            propsGroup.add(rocketWallArtGroup);
 
             // --- (5) 로비 곳곳 관엽 화분 인테리어 ---
             const potLocations = [[-11.8, 7.5], [11.5, 7.5], [-4.2, -7.5], [11.2, -3.5]];
@@ -1720,6 +2097,17 @@
                     ]
                 },
                 {
+                    name: '유나 바리스타',
+                    x: -11.0, y: 0.55, z: -0.65, rotY: Math.PI * 0.5,
+                    isBarista: true,
+                    shirtColor: 0xf59e0b, pantColor: 0x1e293b, hairColor: 0x4a2c18,
+                    phrases: [
+                        '쿠카페 트럭에 오신 걸 환영해요! ☕',
+                        '갓 내린 따뜻한 아메리카노 한 잔 드릴까요?',
+                        '달콤한 바닐라 라떼도 준비되어 있어요 ✨'
+                    ]
+                },
+                {
                     name: '김민수 매니저',
                     x: -6.1, y: 0, z: 1.5, rotY: Math.PI * 0.5,
                     shirtColor: 0x6ea87a, pantColor: 0x334155, hairColor: 0x292524,
@@ -1790,6 +2178,36 @@
                     headGroup.add(ponytail);
                 }
 
+                // 쿠카페 트럭 여자 바리스타 전용 단발머리 + 바이저 모자 + 앞치마 디테일
+                if (cfg.isBarista) {
+                    const bobHairL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.46, 0.48), hairMat);
+                    bobHairL.position.set(-0.38, -0.12, -0.05);
+                    const bobHairR = bobHairL.clone();
+                    bobHairR.position.x = 0.38;
+                    const bobHairBack = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.48, 0.24), hairMat);
+                    bobHairBack.position.set(0, -0.12, -0.34);
+
+                    const visorBand = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.49, 0.49, 0.11, 22),
+                        new THREE.MeshStandardMaterial({ color: 0x3b2f26, roughness: 0.5 })
+                    );
+                    visorBand.position.set(0, 0.18, 0);
+                    const visorBrim = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.44, 0.48, 0.03, 20, 1, false, -Math.PI * 0.4, Math.PI * 0.8),
+                        new THREE.MeshStandardMaterial({ color: 0x3b2f26, roughness: 0.5 })
+                    );
+                    visorBrim.position.set(0, 0.15, 0.32);
+                    visorBrim.rotation.x = 0.15;
+                    headGroup.add(bobHairL, bobHairR, bobHairBack, visorBand, visorBrim);
+
+                    const apron = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.56, 0.68, 0.06),
+                        new THREE.MeshStandardMaterial({ color: 0x3b2f26, roughness: 0.7 })
+                    );
+                    apron.position.set(0, 0.92, 0.39);
+                    npcGroup.add(apron);
+                }
+
                 const eyeMat = new THREE.MeshBasicMaterial({ color: 0x221c18 });
                 [-0.14, 0.14].forEach(ex => {
                     const eye = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), eyeMat);
@@ -1832,12 +2250,12 @@
             landmarks.push(
                 {
                     id: 'cafe',
-                    badge: 'COUCAFE',
+                    badge: 'COUCAFE & ROCKET',
                     floor: '1F 좌측 창가',
-                    title: '쿠카페 (CouCafe)',
-                    text: '통유리창으로 들어오는 자연광을 받으며 커피와 노트북 작업을 즐길 수 있는 사내 카페 코너입니다.',
-                    pos: new THREE.Vector3(-8.5, 0, 1.0),
-                    radius: 3.4
+                    title: '쿠카페 트럭 & 로켓 월 아트',
+                    text: '벽면의 대형 쿠팡 로켓 디자인 조형물 아래 자리한 쿠카페 트럭에서 유나 바리스타가 내리는 커피를 즐겨보세요.',
+                    pos: new THREE.Vector3(-8.8, 0, -0.5),
+                    radius: 3.8
                 },
                 {
                     id: 'kiosk',
@@ -1892,6 +2310,15 @@
                     text: '간식 당첨과 응원, 칭찬 릴레이가 오가는 당팡게시판 코너입니다.',
                     pos: new THREE.Vector3(2.8, 0, 7.6),
                     radius: 3.8
+                },
+                {
+                    id: 'cousome',
+                    badge: 'COUSOME BOARD 💕',
+                    floor: '1F 로비 정면',
+                    title: '쿠썸게시판 (사내 썸 & 설렘)',
+                    text: '사내에서 마주친 설레는 순간이나 익명 썸 시그널을 남기는 쿠썸게시판입니다.',
+                    pos: new THREE.Vector3(0, 0, 0.3),
+                    radius: 3.2
                 },
                 {
                     id: 'couteria',
@@ -2052,6 +2479,11 @@
                     boardData.dangpang.unshift({ nick, msg });
                     redrawDangpangBoard();
                     renderBoardPostList('dangpang');
+                    saveBoardDataToCloud();
+                } else if (activeLandmarkId === 'cousome') {
+                    boardData.cousome.unshift({ nick, msg });
+                    redrawCousomeBoard();
+                    renderBoardPostList('cousome');
                     saveBoardDataToCloud();
                 }
 
@@ -2374,7 +2806,7 @@
                 document.getElementById('landmark-title').textContent = nearestLandmark.title;
                 document.getElementById('landmark-text').textContent = nearestLandmark.text;
 
-                if (nearestLandmark.id === 'blind' || nearestLandmark.id === 'dangpang' || nearestLandmark.id === 'couteria' || nearestLandmark.id === 'board') {
+                if (nearestLandmark.id === 'blind' || nearestLandmark.id === 'dangpang' || nearestLandmark.id === 'cousome' || nearestLandmark.id === 'couteria' || nearestLandmark.id === 'board') {
                     if (activeLandmarkId !== nearestLandmark.id) {
                         document.getElementById('board-post-feedback').textContent = '';
                         renderBoardPostList(nearestLandmark.id);
@@ -2399,6 +2831,13 @@
                         msgInput.placeholder = '추가할 오늘의 메뉴를 입력하세요';
                         submitBtn.textContent = '메뉴 추가';
                         submitBtn.className = 'px-3 py-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-lg transition-all cursor-pointer';
+                    } else if (nearestLandmark.id === 'cousome') {
+                        cornerSelect.classList.add('hidden');
+                        countrySelect.classList.add('hidden');
+                        nickInput.classList.remove('hidden');
+                        msgInput.placeholder = '설레는 썸 시그널이나 고백을 남겨보세요 💕';
+                        submitBtn.textContent = '썸 등록';
+                        submitBtn.className = 'px-3 py-1 bg-pink-600 hover:bg-pink-700 active:scale-95 text-white text-xs font-bold rounded-lg transition-all cursor-pointer';
                     } else {
                         cornerSelect.classList.add('hidden');
                         countrySelect.classList.add('hidden');
