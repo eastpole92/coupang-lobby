@@ -1,501 +1,349 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>사내 로비 3D 탐방 프로토타입</title>
-    <!-- Tailwind CSS -->
-    <!-- Three.js (r128) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Google Fonts: Pretendard / Noto Sans KR -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #dce5ef;
-        }
-        #canvas-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-        /* 캐릭터 머리 위 플로팅 말풍선 UI */
-        .floating-label {
-            position: absolute;
-            transform: translate(-50%, -100%);
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-            z-index: 10;
-        }
-        .status-pill {
-            background: rgba(255, 255, 255, 0.94);
-            backdrop-filter: blur(8px);
-            border: 1.5px solid rgba(148, 163, 184, 0.45);
-            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.12);
-            border-radius: 9999px;
-            padding: 4px 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #1e293b;
-            white-space: nowrap;
-        }
-        .me-badge {
-            background: #334155;
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .npc-bubble {
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
-            border-radius: 16px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #1e293b;
-            white-space: nowrap;
-            position: relative;
-        }
-        .npc-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 6px 6px 0;
-            border-style: solid;
-            border-color: rgba(255, 255, 255, 0.95) transparent transparent;
-        }
-        /* 가상 조이스틱 */
-        #joystick-zone {
-            touch-action: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사내 로비 3D 탐방 프로토타입</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #dce3ec;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      color: #1f2937;
+    }
+
+    #scene-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .panel {
+      position: fixed;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      z-index: 10;
+    }
+
+    .info-box {
+      top: 16px;
+      left: 16px;
+      max-width: 340px;
+      padding: 14px 16px;
+    }
+
+    .info-box h1 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    .info-box p {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #4b5563;
+      margin-bottom: 10px;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .top-right-bar {
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .bottom-zones {
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    button {
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      color: #111827;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    button:hover {
+      background: #f3f4f6;
+    }
+
+    button.active {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    #error-banner {
+      display: none;
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      max-width: 460px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #991b1b;
+      color: #ffffff;
+      font-size: 12px;
+      z-index: 20;
+    }
+  </style>
 </head>
 <body>
-    <div id="canvas-container">
-        <!-- 3D 캔버스 영역 -->
-        <div id="webgl-wrapper" class="w-full h-full"></div>
+  <canvas id="scene-canvas"></canvas>
 
-        <!-- 3D 좌표 기반 오버레이 레이어 (머리 위 이름표, NPC 말풍선) -->
-        <div id="overlay-layer" class="absolute inset-0 pointer-events-none overflow-hidden">
-            <!-- 플레이어 머리 위 상태 알약 UI -->
-            <div id="player-tag" class="floating-label">
-                <div class="status-pill">
-                    <span class="me-badge">나</span>
-                    <span id="pace-label-text">느린 발걸음</span>
-                </div>
-            </div>
-            <!-- NPC 말풍선들이 동적으로 추가됨 -->
-        </div>
-
-        <!-- 상단 좌측: 로비 가이드 & 위치 표시 -->
-        <div class="absolute top-4 left-4 z-20 flex flex-col gap-2 max-w-xs sm:max-w-sm">
-            <div class="bg-white/85 backdrop-blur-md rounded-2xl p-3.5 shadow-lg border border-slate-200/80">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
-                    <h1 class="text-sm sm:text-base font-bold text-slate-800">사내 로비 라운지 산책</h1>
-                </div>
-                <p id="current-zone-desc" class="text-xs text-slate-600 leading-relaxed">
-                    커튼월 통유리로 맑은 채광이 들어오는 1층 화이트 라운지입니다. 자유롭게 걸어 다니며 공간을 둘러보세요.
-                </p>
-                <div class="mt-2.5 pt-2 border-t border-slate-200/70 flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
-                    <span class="px-2 py-0.5 bg-slate-100 rounded-md font-medium text-slate-700">WASD / 방향키</span> 이동
-                    <span class="px-2 py-0.5 bg-slate-100 rounded-md font-medium text-slate-700">마우스 드래그</span> 시점 회전
-                    <span class="px-2 py-0.5 bg-slate-100 rounded-md font-medium text-slate-700">휠</span> 확대/축소
-                </div>
-            </div>
-
-            <!-- 랜드마크 근접 시 나타나는 안내 카드 -->
-            <div id="landmark-card" class="hidden bg-sky-50/95 backdrop-blur-md rounded-2xl p-3.5 shadow-lg border border-sky-200 transition-all duration-300">
-                <div class="flex items-center justify-between mb-1">
-                    <span id="landmark-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-600 text-white">ZONE</span>
-                    <span id="landmark-floor" class="text-[11px] font-semibold text-sky-700">1F 로비</span>
-                </div>
-                <h2 id="landmark-title" class="text-sm font-bold text-slate-800 mt-1">카페 코너 (Café Corner)</h2>
-                <p id="landmark-text" class="text-xs text-slate-600 mt-1 leading-relaxed">
-                    밝은 통유리 라운지에서 동료들과 가볍게 담소를 나누는 공간입니다.
-                </p>
-            </div>
-        </div>
-
-        <!-- 상단 우측: 발걸음 모드 전환 및 빠른 시점 버튼 -->
-        <div class="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
-            <button id="toggle-pace-btn" class="bg-white/90 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-full px-4 py-2.5 shadow-lg border border-slate-200 flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800 cursor-pointer">
-                <span id="pace-icon" class="text-base">🚶</span>
-                <span id="pace-btn-text">느린 발걸음</span>
-                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-700">전환</span>
-            </button>
-
-            <div class="flex gap-1.5">
-                <button id="reset-pos-btn" title="처음 위치로" class="bg-white/85 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer">
-                    🏠 로비 중앙
-                </button>
-                <button id="camera-preset-btn" title="시점 각도 전환" class="bg-white/85 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer">
-                    🎥 시점 전환
-                </button>
-            </div>
-        </div>
-
-        <!-- 하단 좌측: 모바일/마우스용 가상 조이스틱 -->
-        <div class="absolute bottom-5 left-5 z-20 flex items-center gap-3">
-            <div id="joystick-zone" class="w-24 h-24 rounded-full bg-white/60 backdrop-blur-sm border-2 border-white/80 shadow-inner relative flex items-center justify-center cursor-pointer">
-                <div class="w-8 h-8 rounded-full border border-slate-400/30 pointer-events-none"></div>
-                <div id="joystick-knob" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-200 absolute flex items-center justify-center text-slate-400 text-xs pointer-events-none transition-transform duration-75">
-                    ✚
-                </div>
-            </div>
-        </div>
-
-        <!-- 하단 우측: 로비 구역 빠른 산책 안내 미니바 -->
-        <div class="hidden sm:flex absolute bottom-5 right-5 z-20 bg-white/85 backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-lg border border-slate-200/80 items-center gap-3 text-xs text-slate-700">
-            <span class="font-bold text-slate-900">탐방 구역:</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>쿠팡 로켓 보드</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-500"></span>나선형 계단 · 2F</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-400"></span>컬러 푸프 라운지</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-lime-600"></span>커튼월 라운지</span>
-        </div>
+  <div class="panel info-box">
+    <h1>사내 로비 라운지 산책</h1>
+    <p>커튼월 통유리로 맑은 채광이 들어오는 1층 화이트 라운지입니다. 자유롭게 걸어 다니며 공간을 둘러보세요.</p>
+    <div class="controls-hint">
+      <strong>WASD / 방향키</strong> 이동 · <strong>마우스 드래그</strong> 시점 회전 · <strong>휠</strong> 확대/축소
     </div>
+  </div>
 
-    <script>
-        /**
-         * ============================================================================
-         * 사내 로비 3D 탐방 프로토타입 (화이트 커튼월 & 쿠팡 로켓 로고 보드 버전)
-         * ============================================================================
-         */
+  <div class="panel top-right-bar">
+    <button id="btn-slow-walk" type="button">🚶 느린 발걸음 전환</button>
+    <button id="btn-reset-view" type="button">🏠 로비 중앙</button>
+    <button id="btn-camera-mode" type="button">🎥 시점 전환</button>
+  </div>
 
-        let scene, camera, renderer;
-        let playerGroup, playerParts = {};
-        let clock = new THREE.Clock();
+  <div class="panel bottom-zones">
+    <span><strong>탐방 구역:</strong></span>
+    <button type="button" data-pos="0,2.2,8" data-target="0,2,0">쿠팡 로켓 보드</button>
+    <button type="button" data-pos="7,3.5,5" data-target="6,3,0">나선형 계단</button>
+    <button type="button" data-pos="-6,5.5,6" data-target="-5,4.5,-2">2F 컬러 푸프 라운지</button>
+    <button type="button" data-pos="0,2.5,-8" data-target="0,2,0">커튼월 라운지</button>
+  </div>
 
-        const playerState = {
-            position: new THREE.Vector3(0, 0, 4.2),
-            rotationY: Math.PI,
-            velocity: new THREE.Vector3(),
-            isMoving: false,
-            paceIndex: 0,
-            walkCycle: 0,
-            currentFloor: 1
-        };
+  <div id="error-banner"></div>
 
-        const PACE_MODES = [
-            { label: '느린 발걸음', speed: 3.4, bobFreq: 7.5, icon: '🚶' },
-            { label: '여유로운 산책', speed: 5.5, bobFreq: 10.5, icon: '👟' },
-            { label: '경쾌한 발걸음', speed: 8.2, bobFreq: 14.0, icon: '🏃' }
-        ];
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.169.0';
+    import { OrbitControls } from 'https://esm.sh/three@0.169.0/examples/jsm/controls/OrbitControls.js';
 
-        const cameraControl = {
-            yaw: 0,
-            pitch: 0.26,
-            distance: 7.4,
-            minDistance: 3.5,
-            maxDistance: 16.0,
-            isDragging: false,
-            prevMouseX: 0,
-            prevMouseY: 0,
-            presetIndex: 0
-        };
+    const canvas = document.getElementById('scene-canvas');
+    const errorBanner = document.getElementById('error-banner');
 
-        const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
-        const joystickInput = { x: 0, y: 0, active: false };
+    function showError(msg) {
+      errorBanner.textContent = msg;
+      errorBanner.style.display = 'block';
+    }
 
-        const colliders = [];
-        const npcs = [];
-        const landmarks = [];
+    try {
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        powerPreference: 'default'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-        const SPIRAL_STAIR = {
-            centerX: -6.8,
-            centerZ: -3.2,
-            innerRadius: 0.95,
-            outerRadius: 2.95,
-            totalHeight: 4.1,
-            startAngle: Math.PI * 0.55,
-            sweepAngle: Math.PI * 1.45
-        };
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color('#dfe7f0');
 
-        let customTextures = {};
+      const camera = new THREE.PerspectiveCamera(
+        55,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        200
+      );
+      const defaultCamPos = new THREE.Vector3(0, 3.2, 13);
+      const defaultTarget = new THREE.Vector3(0, 2.2, 0);
+      camera.position.copy(defaultCamPos);
 
-        window.onload = function () {
-            try {
-                initScene();
-                createTexturesAndMaterials();
-                buildLobbyEnvironment();
-                buildSpiralStaircaseAndMezzanine();
-                buildFurnitureAndProps();
-                buildPlayerCharacter();
-                spawnNPCCoworkers();
-                setupLandmarks();
-                setupInputsAndUI();
-                animate();
-            } catch (err) {
-                console.error('3D 로비 초기화 중 오류 발생:', err);
-            }
-        };
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.target.copy(defaultTarget);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.maxPolarAngle = Math.PI * 0.49;
+      controls.update();
 
-        /**
-         * 1. 밝은 화이트 & 커튼월 채광 씬/카메라/조명 구성
-         */
-        function initScene() {
-            const container = document.getElementById('webgl-wrapper');
+      // 조명
+      const hemiLight = new THREE.HemisphereLight('#ffffff', '#cbd5e1', 1.3);
+      hemiLight.position.set(0, 20, 0);
+      scene.add(hemiLight);
 
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xdce6f0);
-            scene.fog = new THREE.FogExp2(0xe6edf4, 0.011);
+      const dirLight = new THREE.DirectionalLight('#fffbeb', 1.5);
+      dirLight.position.set(10, 18, 12);
+      scene.add(dirLight);
 
-            const width = container.clientWidth || window.innerWidth;
-            const height = container.clientHeight || window.innerHeight;
+      // 1층 화이트 바닥
+      const floorGeo = new THREE.BoxGeometry(28, 0.4, 24);
+      const floorMat = new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.6 });
+      const floor = new THREE.Mesh(floorGeo, floorMat);
+      floor.position.set(0, -0.2, 0);
+      scene.add(floor);
 
-            camera = new THREE.PerspectiveCamera(46, width / height, 0.1, 140);
-            camera.position.set(0, 3.8, 11.2);
+      // 2층 데크 일부
+      const secondFloorGeo = new THREE.BoxGeometry(12, 0.3, 10);
+      const secondFloorMat = new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.7 });
+      const secondFloor = new THREE.Mesh(secondFloorGeo, secondFloorMat);
+      secondFloor.position.set(-5, 4.2, -2);
+      scene.add(secondFloor);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-            renderer.setSize(width, height);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.outputEncoding = THREE.sRGBEncoding;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.06;
+      // 중앙 로켓 조형물
+      const rocketGroup = new THREE.Group();
+      const bodyMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.7, 0.9, 3.2, 24),
+        new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.35 })
+      );
+      bodyMesh.position.y = 1.6;
+      const noseMesh = new THREE.Mesh(
+        new THREE.ConeGeometry(0.7, 1.3, 24),
+        new THREE.MeshStandardMaterial({ color: '#e11d48', roughness: 0.4 })
+      );
+      noseMesh.position.y = 3.85;
+      rocketGroup.add(bodyMesh, noseMesh);
+      rocketGroup.position.set(0, 0, 0);
+      scene.add(rocketGroup);
 
-            container.appendChild(renderer.domElement);
+      // 나선형 계단(심플 스텝 배치)
+      const stepGeo = new THREE.BoxGeometry(1.8, 0.16, 0.7);
+      const stepMat = new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.5 });
+      for (let i = 0; i < 18; i++) {
+        const angle = i * 0.35;
+        const radius = 2.4;
+        const step = new THREE.Mesh(stepGeo, stepMat);
+        step.position.set(
+          6 + Math.cos(angle) * radius,
+          0.25 * (i + 1),
+          Math.sin(angle) * radius
+        );
+        step.rotation.y = -angle + Math.PI / 2;
+        scene.add(step);
+      }
 
-            // 화이트 미니멀 실내를 위한 부드러운 하늘/바닥 반사광
-            const hemiLight = new THREE.HemisphereLight(0xf8fbff, 0xd8dee6, 1.05);
-            hemiLight.position.set(0, 20, 0);
-            scene.add(hemiLight);
+      // 2F 컬러 푸프
+      const poufColors = ['#fb7185', '#38bdf8', '#facc15', '#34d399'];
+      poufColors.forEach((hex, idx) => {
+        const pouf = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.65, 0.7, 0.45, 20),
+          new THREE.MeshStandardMaterial({ color: hex, roughness: 0.8 })
+        );
+        pouf.position.set(-7 + idx * 1.6, 4.58, -1.5 + (idx % 2) * 1.5);
+        scene.add(pouf);
+      });
 
-            // 좌측 및 후면 커튼월 창문에서 들어오는 맑고 차분한 자연광
-            const sunLight = new THREE.DirectionalLight(0xf4f8ff, 0.95);
-            sunLight.position.set(-14, 15, -10);
-            sunLight.castShadow = true;
-            sunLight.shadow.mapSize.width = 2048;
-            sunLight.shadow.mapSize.height = 2048;
-            sunLight.shadow.camera.near = 1;
-            sunLight.shadow.camera.far = 55;
-            const d = 18;
-            sunLight.shadow.camera.left = -d;
-            sunLight.shadow.camera.right = d;
-            sunLight.shadow.camera.top = d;
-            sunLight.shadow.camera.bottom = -d;
-            sunLight.shadow.bias = -0.0005;
-            scene.add(sunLight);
+      // 커튼월 프레임
+      const frameMat = new THREE.MeshStandardMaterial({ color: '#64748b', metalness: 0.3, roughness: 0.4 });
+      for (let x = -12; x <= 12; x += 4) {
+        const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.14, 7.5, 0.14), frameMat);
+        mullion.position.set(x, 3.75, -11.5);
+        scene.add(mullion);
+      }
 
-            // 정면/우측 부드러운 필 라이트
-            const fillLight = new THREE.DirectionalLight(0xffffff, 0.45);
-            fillLight.position.set(10, 10, 14);
-            scene.add(fillLight);
+      // 이동 및 버튼 상태
+      const keys = new Set();
+      let slowWalk = false;
+      let firstPerson = false;
 
-            window.addEventListener('resize', onWindowResize);
+      window.addEventListener('keydown', (e) => keys.add(e.code));
+      window.addEventListener('keyup', (e) => keys.delete(e.code));
+
+      const btnSlow = document.getElementById('btn-slow-walk');
+      btnSlow.addEventListener('click', () => {
+        slowWalk = !slowWalk;
+        btnSlow.classList.toggle('active', slowWalk);
+      });
+
+      document.getElementById('btn-reset-view').addEventListener('click', () => {
+        camera.position.copy(defaultCamPos);
+        controls.target.copy(defaultTarget);
+        controls.update();
+      });
+
+      const btnCam = document.getElementById('btn-camera-mode');
+      btnCam.addEventListener('click', () => {
+        firstPerson = !firstPerson;
+        btnCam.classList.toggle('active', firstPerson);
+        if (firstPerson) {
+          camera.position.set(0, 1.7, 9);
+          controls.target.set(0, 1.7, 0);
+        } else {
+          camera.position.copy(defaultCamPos);
+          controls.target.copy(defaultTarget);
+        }
+        controls.update();
+      });
+
+      document.querySelectorAll('[data-pos]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const [px, py, pz] = btn.dataset.pos.split(',').map(Number);
+          const [tx, ty, tz] = btn.dataset.target.split(',').map(Number);
+          camera.position.set(px, py, pz);
+          controls.target.set(tx, ty, tz);
+          controls.update();
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const delta = Math.min(clock.getDelta(), 0.05);
+        const speed = (slowWalk ? 2.2 : 5.5) * delta;
+
+        const forward = new THREE.Vector3();
+        camera.getWorldDirection(forward);
+        forward.y = 0;
+        if (forward.lengthSq() > 0) forward.normalize();
+
+        const right = new THREE.Vector3().crossVectors(forward, camera.up).normalize();
+        const move = new THREE.Vector3();
+
+        if (keys.has('KeyW') || keys.has('ArrowUp')) move.add(forward);
+        if (keys.has('KeyS') || keys.has('ArrowDown')) move.sub(forward);
+        if (keys.has('KeyD') || keys.has('ArrowRight')) move.add(right);
+        if (keys.has('KeyA') || keys.has('ArrowLeft')) move.sub(right);
+
+        if (move.lengthSq() > 0) {
+          move.normalize().multiplyScalar(speed);
+          camera.position.add(move);
+          controls.target.add(move);
         }
 
-        function onWindowResize() {
-            const container = document.getElementById('webgl-wrapper');
-            const width = container.clientWidth || window.innerWidth;
-            const height = container.clientHeight || window.innerHeight;
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-        }
+        controls.update();
+        renderer.render(scene, camera);
+      }
 
-        /**
-         * 2. 동적 캔버스 텍스처 생성 (사원증 + 쿠팡 로켓 로고 사내 보드 + 화이트 바닥)
-         */
-        function createTexturesAndMaterials() {
-            // (A) 쿠팡 사원증 텍스처
-            const badgeCanvas = document.createElement('canvas');
-            badgeCanvas.width = 256;
-            badgeCanvas.height = 384;
-            const bCtx = badgeCanvas.getContext('2d');
-
-            bCtx.fillStyle = '#f8fafc';
-            bCtx.fillRect(0, 0, 256, 384);
-            bCtx.strokeStyle = '#cbd5e1';
-            bCtx.lineWidth = 10;
-            bCtx.strokeRect(5, 5, 246, 374);
-
-            bCtx.fillStyle = '#94a3b8';
-            bCtx.beginPath();
-            bCtx.roundRect(98, 18, 60, 14, 7);
-            bCtx.fill();
-
-            bCtx.fillStyle = '#e2e8f0';
-            bCtx.beginPath();
-            bCtx.roundRect(58, 68, 140, 155, 16);
-            bCtx.fill();
-
-            bCtx.fillStyle = '#89b4d8';
-            bCtx.beginPath();
-            bCtx.arc(128, 225, 48, Math.PI, 0);
-            bCtx.fill();
-
-            bCtx.fillStyle = '#e2a382';
-            bCtx.beginPath();
-            bCtx.arc(128, 145, 34, 0, Math.PI * 2);
-            bCtx.fill();
-
-            bCtx.fillStyle = '#89b4d8';
-            bCtx.beginPath();
-            bCtx.arc(128, 134, 35, Math.PI, 0);
-            bCtx.fill();
-
-            bCtx.fillStyle = '#6d9ec7';
-            bCtx.beginPath();
-            bCtx.ellipse(128, 132, 36, 9, 0, Math.PI, 0);
-            bCtx.fill();
-
-            bCtx.fillStyle = '#2d241e';
-            bCtx.beginPath();
-            bCtx.arc(117, 146, 3.2, 0, Math.PI * 2);
-            bCtx.arc(139, 146, 3.2, 0, Math.PI * 2);
-            bCtx.fill();
-
-            bCtx.strokeStyle = '#2d241e';
-            bCtx.lineWidth = 2.5;
-            bCtx.beginPath();
-            bCtx.arc(128, 153, 8, 0.15 * Math.PI, 0.85 * Math.PI);
-            bCtx.stroke();
-
-            bCtx.font = 'bold 34px Arial, sans-serif';
-            const logoParts = [
-                { text: 'coup', color: '#4a2c18' },
-                { text: 'a', color: '#e53935' },
-                { text: 'n', color: '#fbc02d' },
-                { text: 'g', color: '#43a047' }
-            ];
-            let startX = 64;
-            bCtx.textAlign = 'left';
-            logoParts.forEach(part => {
-                bCtx.fillStyle = part.color;
-                bCtx.fillText(part.text, startX, 295);
-                startX += bCtx.measureText(part.text).width;
-            });
-
-            customTextures.idBadge = new THREE.CanvasTexture(badgeCanvas);
-            customTextures.idBadge.encoding = THREE.sRGBEncoding;
-
-            // (B) 사내 보드 텍스처: 짙은 블루-네이비 배경 + COUPANG + 쿠팡 로켓 로고
-            const rocketBoardCanvas = document.createElement('canvas');
-            rocketBoardCanvas.width = 640;
-            rocketBoardCanvas.height = 380;
-            const rCtx = rocketBoardCanvas.getContext('2d');
-
-            // 딥 블루 그라데이션 배경
-            const bgGrad = rCtx.createLinearGradient(0, 0, 640, 380);
-            bgGrad.addColorStop(0, '#1d4f8c');
-            bgGrad.addColorStop(1, '#153b6b');
-            rCtx.fillStyle = bgGrad;
-            rCtx.fillRect(0, 0, 640, 380);
-
-            // 좌측 상단 COUPANG 텍스트
-            rCtx.fillStyle = '#ffffff';
-            rCtx.font = '800 30px Arial, sans-serif';
-            rCtx.textAlign = 'left';
-            rCtx.fillText('COUPANG', 34, 58);
-
-            // 중앙 쿠팡 로켓 로고 일러스트 그리기 (중심 약 345, 205)
-            rCtx.save();
-            rCtx.translate(345, 205);
-            rCtx.rotate(-Math.PI / 4); // 우상향 대각선 로켓 각도
-
-            // 불꽃 (주황/노랑)
-            rCtx.fillStyle = '#f59e0b';
-            rCtx.beginPath();
-            rCtx.moveTo(-24, 62);
-            rCtx.quadraticCurveTo(0, 128, 24, 62);
-            rCtx.closePath();
-            rCtx.fill();
-
-            rCtx.fillStyle = '#fde047';
-            rCtx.beginPath();
-            rCtx.moveTo(-13, 62);
-            rCtx.quadraticCurveTo(0, 102, 13, 62);
-            rCtx.closePath();
-            rCtx.fill();
-
-            // 좌/우 날개 핀 (하늘색/블루)
-            rCtx.fillStyle = '#29b6f6';
-            rCtx.beginPath();
-            rCtx.moveTo(-26, 22);
-            rCtx.lineTo(-56, 62);
-            rCtx.lineTo(-22, 54);
-            rCtx.closePath();
-            rCtx.fill();
-
-            rCtx.beginPath();
-            rCtx.moveTo(26, 22);
-            rCtx.lineTo(56, 62);
-            rCtx.lineTo(22, 54);
-            rCtx.closePath();
-            rCtx.fill();
-
-            // 로켓 동체 (화이트)
-            rCtx.fillStyle = '#ffffff';
-            rCtx.beginPath();
-            rCtx.moveTo(0, -96);
-            rCtx.bezierCurveTo(38, -52, 38, 24, 24, 60);
-            rCtx.lineTo(-24, 60);
-            rCtx.bezierCurveTo(-38, 24, -38, -52, 0, -96);
-            rCtx.closePath();
-            rCtx.fill();
-
-            // 로켓 노즈콘 포인트 (시안/블루)
-            rCtx.fillStyle = '#29b6f6';
-            rCtx.beginPath();
-            rCtx.moveTo(0, -96);
-            rCtx.bezierCurveTo(18, -74, 22, -56, 23, -44);
-            rCtx.lineTo(-23, -44);
-            rCtx.bezierCurveTo(-22, -56, -18, -74, 0, -96);
-            rCtx.closePath();
-            rCtx.fill();
-
-            // 중앙 창문 (하늘색 링 + 내부 청록/블루)
-            rCtx.fillStyle = '#38bdf8';
-            rCtx.beginPath();
-            rCtx.arc(0, -4, 21, 0, Math.PI * 2);
-            rCtx.fill();
-
-            rCtx.fillStyle = '#0284c7';
-            rCtx.beginPath();
-            rCtx.arc(0, -4, 14, 0, Math.PI * 2);
-            rCtx.fill();
-
-            rCtx.fillStyle = '#bae6fd';
-            rCtx.beginPath();
-            rCtx.arc(-4, -8, 4.5, 0, Math.PI * 2);
-            rCtx.fill();
-
-            rCtx.restore();
-
-            customTextures.rocketBoard = new THREE.CanvasTexture(rocketBoardCanvas);
-            customTextures.rocketBoard.encoding = THREE.sRGBEncoding;
-
-            // (C) 화이트 미니멀 바닥 텍스처
-            const floorCanvas = document.createElement('canvas');
-            floorCanvas.width = 512;
-            floorCanvas.height = 512;
-            const fCtx = floorCanvas.getContext('2d');
+      animate();
+    } catch (err) {
+      showError('3D 씬 초기화 중 오류 발생: ' + (err && err.message ? err.message : String(err)));
+    }
+  </script>
+</body>
+</html>
