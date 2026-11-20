@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js (r128) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Google Fonts: Pretendard / Inter -->
+    <!-- Google Fonts: Pretendard / Noto Sans KR -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -23,7 +23,7 @@
             height: 100%;
             overflow: hidden;
             font-family: 'Noto Sans KR', sans-serif;
-            background-color: #e8e4dc;
+            background-color: #dce5ef;
         }
         #canvas-container {
             position: relative;
@@ -44,10 +44,10 @@
             z-index: 10;
         }
         .status-pill {
-            background: rgba(255, 253, 248, 0.92);
+            background: rgba(255, 255, 255, 0.94);
             backdrop-filter: blur(8px);
-            border: 1.5px solid rgba(180, 170, 155, 0.45);
-            box-shadow: 0 4px 12px rgba(45, 38, 30, 0.12);
+            border: 1.5px solid rgba(148, 163, 184, 0.45);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.12);
             border-radius: 9999px;
             padding: 4px 12px;
             display: inline-flex;
@@ -55,11 +55,11 @@
             gap: 6px;
             font-size: 13px;
             font-weight: 700;
-            color: #3a332c;
+            color: #1e293b;
             white-space: nowrap;
         }
         .me-badge {
-            background: #6b705c;
+            background: #334155;
             color: #fff;
             font-size: 10px;
             font-weight: 700;
@@ -71,9 +71,9 @@
             justify-content: center;
         }
         .npc-bubble {
-            background: rgba(255, 255, 255, 0.94);
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(59, 130, 246, 0.3);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
             border-radius: 16px;
             padding: 6px 12px;
             font-size: 12px;
@@ -90,7 +90,7 @@
             transform: translateX(-50%);
             border-width: 6px 6px 0;
             border-style: solid;
-            border-color: rgba(255, 255, 255, 0.94) transparent transparent;
+            border-color: rgba(255, 255, 255, 0.95) transparent transparent;
         }
         /* 가상 조이스틱 */
         #joystick-zone {
@@ -109,55 +109,55 @@
             <div id="player-tag" class="floating-label">
                 <div class="status-pill">
                     <span class="me-badge">나</span>
-                    <span id="pace-label-text">NEWBIE</span>
+                    <span id="pace-label-text">느린 발걸음</span>
                 </div>
             </div>
-            <!-- NPC 및 랜드마크 말풍선들이 동적으로 추가됨 -->
+            <!-- NPC 말풍선들이 동적으로 추가됨 -->
         </div>
 
         <!-- 상단 좌측: 로비 가이드 & 위치 표시 -->
         <div class="absolute top-4 left-4 z-20 flex flex-col gap-2 max-w-xs sm:max-w-sm">
-            <div class="bg-white/85 backdrop-blur-md rounded-2xl p-3.5 shadow-lg border border-stone-200/80">
+            <div class="bg-white/85 backdrop-blur-md rounded-2xl p-3.5 shadow-lg border border-slate-200/80">
                 <div class="flex items-center gap-2 mb-1">
                     <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
-                    <h1 class="text-sm sm:text-base font-bold text-stone-800">사내 로비 라운지 산책</h1>
+                    <h1 class="text-sm sm:text-base font-bold text-slate-800">사내 로비 라운지 산책</h1>
                 </div>
-                <p id="current-zone-desc" class="text-xs text-stone-600 leading-relaxed">
-                    따스한 햇살이 드는 1층 메인 로비입니다. 자유롭게 걸어 다니며 공간을 둘러보세요.
+                <p id="current-zone-desc" class="text-xs text-slate-600 leading-relaxed">
+                    커튼월 통유리로 맑은 채광이 들어오는 1층 화이트 라운지입니다. 자유롭게 걸어 다니며 공간을 둘러보세요.
                 </p>
-                <div class="mt-2.5 pt-2 border-t border-stone-200/70 flex flex-wrap items-center gap-1.5 text-[11px] text-stone-500">
-                    <span class="px-2 py-0.5 bg-stone-100 rounded-md font-medium text-stone-700">WASD / 방향키</span> 이동
-                    <span class="px-2 py-0.5 bg-stone-100 rounded-md font-medium text-stone-700">마우스 드래그</span> 시점 회전
-                    <span class="px-2 py-0.5 bg-stone-100 rounded-md font-medium text-stone-700">휠</span> 확대/축소
+                <div class="mt-2.5 pt-2 border-t border-slate-200/70 flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
+                    <span class="px-2 py-0.5 bg-slate-100 rounded-md font-medium text-slate-700">WASD / 방향키</span> 이동
+                    <span class="px-2 py-0.5 bg-slate-100 rounded-md font-medium text-slate-700">마우스 드래그</span> 시점 회전
+                    <span class="px-2 py-0.5 bg-slate-100 rounded-md font-medium text-slate-700">휠</span> 확대/축소
                 </div>
             </div>
 
             <!-- 랜드마크 근접 시 나타나는 안내 카드 -->
             <div id="landmark-card" class="hidden bg-sky-50/95 backdrop-blur-md rounded-2xl p-3.5 shadow-lg border border-sky-200 transition-all duration-300">
                 <div class="flex items-center justify-between mb-1">
-                    <span id="landmark-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-500 text-white">ZONE</span>
+                    <span id="landmark-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-600 text-white">ZONE</span>
                     <span id="landmark-floor" class="text-[11px] font-semibold text-sky-700">1F 로비</span>
                 </div>
                 <h2 id="landmark-title" class="text-sm font-bold text-slate-800 mt-1">카페 코너 (Café Corner)</h2>
                 <p id="landmark-text" class="text-xs text-slate-600 mt-1 leading-relaxed">
-                    향긋한 원두커피와 함께 동료들과 가볍게 담소를 나누는 공간입니다.
+                    밝은 통유리 라운지에서 동료들과 가볍게 담소를 나누는 공간입니다.
                 </p>
             </div>
         </div>
 
         <!-- 상단 우측: 발걸음 모드 전환 및 빠른 시점 버튼 -->
         <div class="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
-            <button id="toggle-pace-btn" class="bg-white/90 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-full px-4 py-2.5 shadow-lg border border-stone-200 flex items-center gap-2 text-xs sm:text-sm font-bold text-stone-800 cursor-pointer">
+            <button id="toggle-pace-btn" class="bg-white/90 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-full px-4 py-2.5 shadow-lg border border-slate-200 flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800 cursor-pointer">
                 <span id="pace-icon" class="text-base">🚶</span>
                 <span id="pace-btn-text">느린 발걸음</span>
                 <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-700">전환</span>
             </button>
 
             <div class="flex gap-1.5">
-                <button id="reset-pos-btn" title="처음 위치로" class="bg-white/85 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-stone-200 text-xs font-semibold text-stone-700 cursor-pointer">
+                <button id="reset-pos-btn" title="처음 위치로" class="bg-white/85 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer">
                     🏠 로비 중앙
                 </button>
-                <button id="camera-preset-btn" title="시점 각도 전환" class="bg-white/85 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-stone-200 text-xs font-semibold text-stone-700 cursor-pointer">
+                <button id="camera-preset-btn" title="시점 각도 전환" class="bg-white/85 hover:bg-white active:scale-95 transition-all backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer">
                     🎥 시점 전환
                 </button>
             </div>
@@ -165,47 +165,41 @@
 
         <!-- 하단 좌측: 모바일/마우스용 가상 조이스틱 -->
         <div class="absolute bottom-5 left-5 z-20 flex items-center gap-3">
-            <div id="joystick-zone" class="w-28 h-28 rounded-full bg-white/40 backdrop-blur-sm border-2 border-white/70 shadow-inner relative flex items-center justify-center cursor-pointer">
-                <div class="w-10 h-10 rounded-full border border-stone-400/30 pointer-events-none"></div>
-                <div id="joystick-knob" class="w-11 h-11 rounded-full bg-white/95 shadow-md border border-stone-200 absolute flex items-center justify-center text-stone-400 text-xs pointer-events-none transition-transform duration-75">
+            <div id="joystick-zone" class="w-24 h-24 rounded-full bg-white/60 backdrop-blur-sm border-2 border-white/80 shadow-inner relative flex items-center justify-center cursor-pointer">
+                <div class="w-8 h-8 rounded-full border border-slate-400/30 pointer-events-none"></div>
+                <div id="joystick-knob" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-200 absolute flex items-center justify-center text-slate-400 text-xs pointer-events-none transition-transform duration-75">
                     ✚
                 </div>
             </div>
         </div>
 
         <!-- 하단 우측: 로비 구역 빠른 산책 안내 미니바 -->
-        <div class="hidden sm:flex absolute bottom-5 right-5 z-20 bg-white/85 backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-lg border border-stone-200/80 items-center gap-3 text-xs text-stone-700">
-            <span class="font-bold text-stone-900">탐방 구역:</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span>카페 코너</span>
+        <div class="hidden sm:flex absolute bottom-5 right-5 z-20 bg-white/85 backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-lg border border-slate-200/80 items-center gap-3 text-xs text-slate-700">
+            <span class="font-bold text-slate-900">탐방 구역:</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>쿠팡 로켓 보드</span>
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-500"></span>나선형 계단 · 2F</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span>컬러 푸프 라운지</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>디지털 현황 보드</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-400"></span>컬러 푸프 라운지</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-lime-600"></span>커튼월 라운지</span>
         </div>
     </div>
 
     <script>
         /**
          * ============================================================================
-         * 사내 로비 3D 탐방 프로토타입 (Three.js 단일 파일 구현)
-         * - 캐릭터: 하늘색 창모자, 하늘색 긴팔 맨투맨(남색 소매), 남색 바지, 흰 신발,
-         *           쿠팡 로고 & 헤드셋 없는 증명사진이 들어간 사원증 목걸이 착용
-         * - 공간: 통유리 채광 로비, 카페 코너, 컬러 푸프 라운지, 디지털 안내 보드 & 키오스크,
-         *         걸어서 올라갈 수 있는 나선형 계단 및 2층 메자닌 발코니
+         * 사내 로비 3D 탐방 프로토타입 (화이트 커튼월 & 쿠팡 로켓 로고 보드 버전)
          * ============================================================================
          */
 
-        // 전역 변수 설정
         let scene, camera, renderer;
         let playerGroup, playerParts = {};
         let clock = new THREE.Clock();
 
-        // 플레이어 상태 및 이동 파라미터
         const playerState = {
-            position: new THREE.Vector3(0, 0, 4),
-            rotationY: Math.PI, // 정면(카메라 쪽)을 바라보도록 초기 설정
+            position: new THREE.Vector3(0, 0, 4.2),
+            rotationY: Math.PI,
             velocity: new THREE.Vector3(),
             isMoving: false,
-            paceIndex: 0, // 0: 느린 발걸음, 1: 보통 산책, 2: 경쾌한 발걸음
+            paceIndex: 0,
             walkCycle: 0,
             currentFloor: 1
         };
@@ -216,11 +210,10 @@
             { label: '경쾌한 발걸음', speed: 8.2, bobFreq: 14.0, icon: '🏃' }
         ];
 
-        // 카메라 궤도(Orbit) 제어 파라미터
         const cameraControl = {
-            yaw: 0,          // 수평 회전각
-            pitch: 0.32,     // 수직 각도
-            distance: 7.5,   // 캐릭터와의 거리
+            yaw: 0,
+            pitch: 0.26,
+            distance: 7.4,
             minDistance: 3.5,
             maxDistance: 16.0,
             isDragging: false,
@@ -229,27 +222,25 @@
             presetIndex: 0
         };
 
-        // 입력 상태
         const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
         const joystickInput = { x: 0, y: 0, active: false };
 
-        // 충돌 박스(장애물) 및 계단/2층 바닥 데이터
-        const colliders = []; // { minX, maxX, minZ, maxZ, minY, maxY }
-        const npcs = [];      // { group, head, speechEl, phrases, timer, basePos }
-        const landmarks = []; // { id, badge, floor, title, text, pos, radius }
+        const colliders = [];
+        const npcs = [];
+        const landmarks = [];
 
-        // 나선형 계단 기하학 파라미터 (실제 걸어 올라갈 수 있도록 높이 계산에 사용)
         const SPIRAL_STAIR = {
-            centerX: 3.2,
-            centerZ: -3.8,
-            innerRadius: 1.0,
-            outerRadius: 3.1,
-            totalHeight: 4.2,
-            startAngle: Math.PI * 0.65,   // 1층 입구 방향
-            sweepAngle: Math.PI * 1.45    // 반시계방향 회전 상승
+            centerX: -6.8,
+            centerZ: -3.2,
+            innerRadius: 0.95,
+            outerRadius: 2.95,
+            totalHeight: 4.1,
+            startAngle: Math.PI * 0.55,
+            sweepAngle: Math.PI * 1.45
         };
 
-        // 초기화 실행
+        let customTextures = {};
+
         window.onload = function () {
             try {
                 initScene();
@@ -268,20 +259,20 @@
         };
 
         /**
-         * 1. Three.js 씬, 카메라, 렌더러 및 조명 구성
+         * 1. 밝은 화이트 & 커튼월 채광 씬/카메라/조명 구성
          */
         function initScene() {
             const container = document.getElementById('webgl-wrapper');
 
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xefeae1);
-            scene.fog = new THREE.FogExp2(0xefeae1, 0.014);
+            scene.background = new THREE.Color(0xdce6f0);
+            scene.fog = new THREE.FogExp2(0xe6edf4, 0.011);
 
             const width = container.clientWidth || window.innerWidth;
             const height = container.clientHeight || window.innerHeight;
 
-            camera = new THREE.PerspectiveCamera(48, width / height, 0.1, 120);
-            camera.position.set(0, 4.5, 11);
+            camera = new THREE.PerspectiveCamera(46, width / height, 0.1, 140);
+            camera.position.set(0, 3.8, 11.2);
 
             renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
             renderer.setSize(width, height);
@@ -290,18 +281,18 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.outputEncoding = THREE.sRGBEncoding;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.08;
+            renderer.toneMappingExposure = 1.06;
 
             container.appendChild(renderer.domElement);
 
-            // 따스한 실내외 자연광 조명 세팅
-            const hemiLight = new THREE.HemisphereLight(0xfffaf0, 0xc8bfb0, 0.85);
+            // 화이트 미니멀 실내를 위한 부드러운 하늘/바닥 반사광
+            const hemiLight = new THREE.HemisphereLight(0xf8fbff, 0xd8dee6, 1.05);
             hemiLight.position.set(0, 20, 0);
             scene.add(hemiLight);
 
-            // 통유리 창문(좌측 X = -14 방향)에서 들어오는 따뜻한 오후 햇살
-            const sunLight = new THREE.DirectionalLight(0xfff1d6, 1.15);
-            sunLight.position.set(-18, 16, 10);
+            // 좌측 및 후면 커튼월 창문에서 들어오는 맑고 차분한 자연광
+            const sunLight = new THREE.DirectionalLight(0xf4f8ff, 0.95);
+            sunLight.position.set(-14, 15, -10);
             sunLight.castShadow = true;
             sunLight.shadow.mapSize.width = 2048;
             sunLight.shadow.mapSize.height = 2048;
@@ -315,16 +306,11 @@
             sunLight.shadow.bias = -0.0005;
             scene.add(sunLight);
 
-            // 실내 천장 보조 따뜻한 포인트 라이트
-            const lobbyWarmLight = new THREE.PointLight(0xffe4b5, 0.45, 25);
-            lobbyWarmLight.position.set(2, 7.5, 2);
-            scene.add(lobbyWarmLight);
+            // 정면/우측 부드러운 필 라이트
+            const fillLight = new THREE.DirectionalLight(0xffffff, 0.45);
+            fillLight.position.set(10, 10, 14);
+            scene.add(fillLight);
 
-            const cafeLight = new THREE.PointLight(0xffd28a, 0.6, 12);
-            cafeLight.position.set(-8.5, 3.2, -1);
-            scene.add(cafeLight);
-
-            // 창 크기 변경 대응
             window.addEventListener('resize', onWindowResize);
         }
 
@@ -338,78 +324,69 @@
         }
 
         /**
-         * 2. 동적 캔버스 텍스처 생성 (사원증, 카페 간판, 키오스크, 사내 지도 보드, 바닥 질감)
+         * 2. 동적 캔버스 텍스처 생성 (사원증 + 쿠팡 로켓 로고 사내 보드 + 화이트 바닥)
          */
-        let customTextures = {};
-
         function createTexturesAndMaterials() {
-            // (A) 쿠팡 사원증 텍스처 (쿠팡 로고 + 헤드셋 없는 캐릭터 증명사진, 기타 텍스트 없음)
+            // (A) 쿠팡 사원증 텍스처
             const badgeCanvas = document.createElement('canvas');
             badgeCanvas.width = 256;
             badgeCanvas.height = 384;
             const bCtx = badgeCanvas.getContext('2d');
 
-            // 카드 배경
             bCtx.fillStyle = '#f8fafc';
             bCtx.fillRect(0, 0, 256, 384);
             bCtx.strokeStyle = '#cbd5e1';
             bCtx.lineWidth = 10;
             bCtx.strokeRect(5, 5, 246, 374);
 
-            // 상단 스트랩 고리 홀
             bCtx.fillStyle = '#94a3b8';
             bCtx.beginPath();
             bCtx.roundRect(98, 18, 60, 14, 7);
             bCtx.fill();
 
-            // 증명사진 프레임 배경
             bCtx.fillStyle = '#e2e8f0';
             bCtx.beginPath();
             bCtx.roundRect(58, 68, 140, 155, 16);
             bCtx.fill();
 
-            // 증명사진 속 캐릭터 (하늘색 모자 + 맨투맨, 헤드셋 없음)
-            // 몸통
             bCtx.fillStyle = '#89b4d8';
             bCtx.beginPath();
             bCtx.arc(128, 225, 48, Math.PI, 0);
             bCtx.fill();
-            // 얼굴
+
             bCtx.fillStyle = '#e2a382';
             bCtx.beginPath();
             bCtx.arc(128, 145, 34, 0, Math.PI * 2);
             bCtx.fill();
-            // 모자 크라운
+
             bCtx.fillStyle = '#89b4d8';
             bCtx.beginPath();
             bCtx.arc(128, 134, 35, Math.PI, 0);
             bCtx.fill();
-            // 모자 창
+
             bCtx.fillStyle = '#6d9ec7';
             bCtx.beginPath();
             bCtx.ellipse(128, 132, 36, 9, 0, Math.PI, 0);
             bCtx.fill();
-            // 눈 & 미소
+
             bCtx.fillStyle = '#2d241e';
             bCtx.beginPath();
             bCtx.arc(117, 146, 3.2, 0, Math.PI * 2);
             bCtx.arc(139, 146, 3.2, 0, Math.PI * 2);
             bCtx.fill();
+
             bCtx.strokeStyle = '#2d241e';
             bCtx.lineWidth = 2.5;
             bCtx.beginPath();
             bCtx.arc(128, 153, 8, 0.15 * Math.PI, 0.85 * Math.PI);
             bCtx.stroke();
 
-            // 하단 coupang 로고만 깔끔하게 배치
             bCtx.font = 'bold 34px Arial, sans-serif';
-            bCtx.textAlign = 'center';
             const logoParts = [
                 { text: 'coup', color: '#4a2c18' },
                 { text: 'a', color: '#e53935' },
                 { text: 'n', color: '#fbc02d' },
-                { text: 'g', color: '#43a047' },
-                { text: ' ', color: '#039be5' }
+                { text: 'g', color: '#43a047' }
             ];
             let startX = 64;
             bCtx.textAlign = 'left';
@@ -422,1296 +399,104 @@
             customTextures.idBadge = new THREE.CanvasTexture(badgeCanvas);
             customTextures.idBadge.encoding = THREE.sRGBEncoding;
 
-            // (B) 사내 현황/경로 지도 보드 텍스처
-            const boardCanvas = document.createElement('canvas');
-            boardCanvas.width = 512;
-            boardCanvas.height = 320;
-            const mCtx = boardCanvas.getContext('2d');
-            mCtx.fillStyle = '#15325b';
-            mCtx.fillRect(0, 0, 512, 320);
-            mCtx.strokeStyle = '#38bdf8';
-            mCtx.lineWidth = 6;
-            mCtx.strokeRect(10, 10, 492, 300);
+            // (B) 사내 보드 텍스처: 짙은 블루-네이비 배경 + COUPANG + 쿠팡 로켓 로고
+            const rocketBoardCanvas = document.createElement('canvas');
+            rocketBoardCanvas.width = 640;
+            rocketBoardCanvas.height = 380;
+            const rCtx = rocketBoardCanvas.getContext('2d');
 
-            mCtx.fillStyle = '#e0f2fe';
-            mCtx.font = 'bold 26px "Noto Sans KR", sans-serif';
-            mCtx.fillText('COUPANG', 32, 52);
+            // 딥 블루 그라데이션 배경
+            const bgGrad = rCtx.createLinearGradient(0, 0, 640, 380);
+            bgGrad.addColorStop(0, '#1d4f8c');
+            bgGrad.addColorStop(1, '#153b6b');
+            rCtx.fillStyle = bgGrad;
+            rCtx.fillRect(0, 0, 640, 380);
 
-            // 네트워크 노선 그래픽
-            mCtx.strokeStyle = '#38bdf8';
-            mCtx.lineWidth = 2.5;
-            const nodes = [
-                [80, 140], [160, 110], [250, 165], [340, 115], [430, 150],
-                [130, 220], [230, 240], [360, 215], [440, 245]
-            ];
-            for (let i = 0; i < nodes.length - 1; i++) {
-                mCtx.beginPath();
-                mCtx.moveTo(nodes[i][0], nodes[i][1]);
-                mCtx.lineTo(nodes[i + 1][0], nodes[i + 1][1]);
-                mCtx.stroke();
-            }
-            nodes.forEach((n, idx) => {
-                mCtx.fillStyle = idx % 2 === 0 ? '#38bdf8' : '#fbbf24';
-                mCtx.beginPath();
-                mCtx.arc(n[0], n[1], 7, 0, Math.PI * 2);
-                mCtx.fill();
-            });
-            customTextures.mapBoard = new THREE.CanvasTexture(boardCanvas);
-            customTextures.mapBoard.encoding = THREE.sRGBEncoding;
+            // 좌측 상단 COUPANG 텍스트
+            rCtx.fillStyle = '#ffffff';
+            rCtx.font = '800 30px Arial, sans-serif';
+            rCtx.textAlign = 'left';
+            rCtx.fillText('COUPANG', 34, 58);
 
-            // (C) 카페 코너 간판 텍스처
-            const cafeCanvas = document.createElement('canvas');
-            cafeCanvas.width = 512;
-            cafeCanvas.height = 128;
-            const cCtx = cafeCanvas.getContext('2d');
-            cCtx.fillStyle = '#292524';
-            cCtx.fillRect(0, 0, 512, 128);
-            cCtx.fillStyle = '#fef3c7';
-            cCtx.font = 'bold 48px Georgia, serif';
-            cCtx.textAlign = 'center';
-            cCtx.fillText('Café Corner', 256, 80);
-            customTextures.cafeSign = new THREE.CanvasTexture(cafeCanvas);
-            customTextures.cafeSign.encoding = THREE.sRGBEncoding;
+            // 중앙 쿠팡 로켓 로고 일러스트 그리기 (중심 약 345, 205)
+            rCtx.save();
+            rCtx.translate(345, 205);
+            rCtx.rotate(-Math.PI / 4); // 우상향 대각선 로켓 각도
 
-            // (D) 디지털 키오스크 화면 텍스처
-            const kioskCanvas = document.createElement('canvas');
-            kioskCanvas.width = 256;
-            kioskCanvas.height = 420;
-            const kCtx = kioskCanvas.getContext('2d');
-            kCtx.fillStyle = '#f8fafc';
-            kCtx.fillRect(0, 0, 256, 420);
-            kCtx.fillStyle = '#0284c7';
-            kCtx.fillRect(0, 0, 256, 70);
-            kCtx.fillStyle = '#ffffff';
-            kCtx.font = 'bold 22px "Noto Sans KR", sans-serif';
-            kCtx.textAlign = 'center';
-            kCtx.fillText('로비 안내 키오스크', 128, 44);
+            // 불꽃 (주황/노랑)
+            rCtx.fillStyle = '#f59e0b';
+            rCtx.beginPath();
+            rCtx.moveTo(-24, 62);
+            rCtx.quadraticCurveTo(0, 128, 24, 62);
+            rCtx.closePath();
+            rCtx.fill();
 
-            kCtx.fillStyle = '#e0f2fe';
-            kCtx.fillRect(24, 95, 208, 65);
-            kCtx.fillRect(24, 178, 208, 65);
-            kCtx.fillRect(24, 261, 208, 65);
-            kCtx.fillStyle = '#0369a1';
-            kCtx.font = 'bold 18px "Noto Sans KR", sans-serif';
-            kCtx.fillText('1F 카페 & 라운지', 128, 134);
-            kCtx.fillText('2F 오픈 워크스페이스', 128, 217);
-            kCtx.fillText('사원 방문 체크인', 128, 300);
-            customTextures.kioskScreen = new THREE.CanvasTexture(kioskCanvas);
-            customTextures.kioskScreen.encoding = THREE.sRGBEncoding;
+            rCtx.fillStyle = '#fde047';
+            rCtx.beginPath();
+            rCtx.moveTo(-13, 62);
+            rCtx.quadraticCurveTo(0, 102, 13, 62);
+            rCtx.closePath();
+            rCtx.fill();
 
-            // (E) 콘크리트 타일 로비 바닥 텍스처
+            // 좌/우 날개 핀 (하늘색/블루)
+            rCtx.fillStyle = '#29b6f6';
+            rCtx.beginPath();
+            rCtx.moveTo(-26, 22);
+            rCtx.lineTo(-56, 62);
+            rCtx.lineTo(-22, 54);
+            rCtx.closePath();
+            rCtx.fill();
+
+            rCtx.beginPath();
+            rCtx.moveTo(26, 22);
+            rCtx.lineTo(56, 62);
+            rCtx.lineTo(22, 54);
+            rCtx.closePath();
+            rCtx.fill();
+
+            // 로켓 동체 (화이트)
+            rCtx.fillStyle = '#ffffff';
+            rCtx.beginPath();
+            rCtx.moveTo(0, -96);
+            rCtx.bezierCurveTo(38, -52, 38, 24, 24, 60);
+            rCtx.lineTo(-24, 60);
+            rCtx.bezierCurveTo(-38, 24, -38, -52, 0, -96);
+            rCtx.closePath();
+            rCtx.fill();
+
+            // 로켓 노즈콘 포인트 (시안/블루)
+            rCtx.fillStyle = '#29b6f6';
+            rCtx.beginPath();
+            rCtx.moveTo(0, -96);
+            rCtx.bezierCurveTo(18, -74, 22, -56, 23, -44);
+            rCtx.lineTo(-23, -44);
+            rCtx.bezierCurveTo(-22, -56, -18, -74, 0, -96);
+            rCtx.closePath();
+            rCtx.fill();
+
+            // 중앙 창문 (하늘색 링 + 내부 청록/블루)
+            rCtx.fillStyle = '#38bdf8';
+            rCtx.beginPath();
+            rCtx.arc(0, -4, 21, 0, Math.PI * 2);
+            rCtx.fill();
+
+            rCtx.fillStyle = '#0284c7';
+            rCtx.beginPath();
+            rCtx.arc(0, -4, 14, 0, Math.PI * 2);
+            rCtx.fill();
+
+            rCtx.fillStyle = '#bae6fd';
+            rCtx.beginPath();
+            rCtx.arc(-4, -8, 4.5, 0, Math.PI * 2);
+            rCtx.fill();
+
+            rCtx.restore();
+
+            customTextures.rocketBoard = new THREE.CanvasTexture(rocketBoardCanvas);
+            customTextures.rocketBoard.encoding = THREE.sRGBEncoding;
+
+            // (C) 화이트 미니멀 바닥 텍스처
             const floorCanvas = document.createElement('canvas');
             floorCanvas.width = 512;
             floorCanvas.height = 512;
             const fCtx = floorCanvas.getContext('2d');
-            fCtx.fillStyle = '#d4cec4';
-            fCtx.fillRect(0, 0, 512, 512);
-            fCtx.strokeStyle = '#c2bbb0';
-            fCtx.lineWidth = 3;
-            fCtx.strokeRect(0, 0, 256, 256);
-            fCtx.strokeRect(256, 0, 256, 256);
-            fCtx.strokeRect(0, 256, 256, 256);
-            fCtx.strokeRect(256, 256, 256, 256);
-            // 미세한 질감 노이즈
-            for (let i = 0; i < 1200; i++) {
-                fCtx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.08)' : 'rgba(90,82,72,0.06)';
-                fCtx.fillRect(Math.random() * 512, Math.random() * 512, 3, 3);
-            }
-            const floorTex = new THREE.CanvasTexture(floorCanvas);
-            floorTex.wrapS = THREE.RepeatWrapping;
-            floorTex.wrapT = THREE.RepeatWrapping;
-            floorTex.repeat.set(14, 14);
-            floorTex.encoding = THREE.sRGBEncoding;
-            customTextures.lobbyFloor = floorTex;
-        }
-
-        /**
-         * 3. 사내 로비 건축 구조 (바닥, 통유리 창문, 기둥, 우드 천장, 행잉 플랜트)
-         */
-        function buildLobbyEnvironment() {
-            const lobbyGroup = new THREE.Group();
-
-            // 1층 메인 바닥 (28 x 28)
-            const floorGeo = new THREE.PlaneGeometry(28, 28);
-            const floorMat = new THREE.MeshStandardMaterial({
-                map: customTextures.lobbyFloor,
-                roughness: 0.65,
-                metalness: 0.05
-            });
-            const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-            floorMesh.rotation.x = -Math.PI / 2;
-            floorMesh.receiveShadow = true;
-            lobbyGroup.add(floorMesh);
-
-            // 중앙 산책 유도 연베이지 카펫 러너
-            const rugGeo = new THREE.PlaneGeometry(6.5, 16);
-            const rugMat = new THREE.MeshStandardMaterial({ color: 0xe3dcd0, roughness: 0.85 });
-            const rugMesh = new THREE.Mesh(rugGeo, rugMat);
-            rugMesh.rotation.x = -Math.PI / 2;
-            rugMesh.position.set(-0.5, 0.01, 1.5);
-            rugMesh.receiveShadow = true;
-            lobbyGroup.add(rugMesh);
-
-            // 우드 천장 루버 (높이 9.2m)
-            const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xb88b5a, roughness: 0.6 });
-            const ceilingBase = new THREE.Mesh(new THREE.BoxGeometry(28, 0.4, 28), ceilingMat);
-            ceilingBase.position.set(0, 9.4, 0);
-            lobbyGroup.add(ceilingBase);
-
-            for (let x = -12; x <= 12; x += 2.0) {
-                const beam = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.45, 27), ceilingMat);
-                beam.position.set(x, 9.0, 0);
-                lobbyGroup.add(beam);
-            }
-
-            // 좌측 대형 통유리 창문 벽 (X = -13.5)
-            const frameMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.4, metalness: 0.5 });
-            const glassMat = new THREE.MeshPhysicalMaterial({
-                color: 0xe0f2fe,
-                transparent: true,
-                opacity: 0.28,
-                roughness: 0.1
-            });
-
-            const glassPane = new THREE.Mesh(new THREE.PlaneGeometry(26, 9), glassMat);
-            glassPane.rotation.y = Math.PI / 2;
-            glassPane.position.set(-13.4, 4.5, 0);
-            lobbyGroup.add(glassPane);
-
-            // 통유리 창살 프레임
-            for (let z = -12; z <= 12; z += 3) {
-                const vMullion = new THREE.Mesh(new THREE.BoxGeometry(0.22, 9.2, 0.18), frameMat);
-                vMullion.position.set(-13.4, 4.6, z);
-                vMullion.castShadow = true;
-                lobbyGroup.add(vMullion);
-            }
-            for (let y = 2.2; y <= 8.8; y += 2.2) {
-                const hMullion = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.15, 26), frameMat);
-                hMullion.position.set(-13.4, y, 0);
-                lobbyGroup.add(hMullion);
-            }
-
-            // 창밖 밝은 햇살 배경 (나무와 부드러운 하늘 벽)
-            const outsideBackdrop = new THREE.Mesh(
-                new THREE.PlaneGeometry(36, 18),
-                new THREE.MeshBasicMaterial({ color: 0xfff8eb })
-            );
-            outsideBackdrop.rotation.y = Math.PI / 2;
-            outsideBackdrop.position.set(-18, 7, 0);
-            lobbyGroup.add(outsideBackdrop);
-
-            // 외벽 (뒷벽 Z = -13.5, 우측벽 X = 13.5)
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0xe5dfd5, roughness: 0.8 });
-            const backWall = new THREE.Mesh(new THREE.BoxGeometry(28, 9.4, 0.5), wallMat);
-            backWall.position.set(0, 4.7, -13.5);
-            backWall.receiveShadow = true;
-            lobbyGroup.add(backWall);
-
-            const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 9.4, 28), wallMat);
-            rightWall.position.set(13.5, 4.7, 0);
-            rightWall.receiveShadow = true;
-            lobbyGroup.add(rightWall);
-
-            // 구조 콘크리트 기둥 & 우드 클래딩 포인트
-            const concreteMat = new THREE.MeshStandardMaterial({ color: 0xa8a29e, roughness: 0.75 });
-            const pillarPositions = [[-11.5, -6], [-11.5, 5], [11.5, -6], [11.5, 5]];
-            pillarPositions.forEach(([px, pz]) => {
-                const pillar = new THREE.Mesh(new THREE.BoxGeometry(1.1, 9.2, 1.1), concreteMat);
-                pillar.position.set(px, 4.6, pz);
-                pillar.castShadow = true;
-                pillar.receiveShadow = true;
-                lobbyGroup.add(pillar);
-                addCollider(px - 0.65, px + 0.65, pz - 0.65, pz + 0.65, 0, 9);
-            });
-
-            // 2층 난간 위 행잉 플랜트(녹색 덩굴 화분)
-            const leafMat = new THREE.MeshStandardMaterial({ color: 0x4d7c0f, roughness: 0.7 });
-            for (let z = -9; z <= 3; z += 1.8) {
-                const vineLen = 0.8 + (Math.abs(z) % 3) * 0.45;
-                const vine = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.08, vineLen, 7), leafMat);
-                vine.position.set(-7.3, 4.2 - vineLen / 2, z);
-                lobbyGroup.add(vine);
-            }
-
-            scene.add(lobbyGroup);
-        }
-
-        /**
-         * 4. 나선형 계단 및 2층 메자닌 발코니 (실제 캐릭터가 걸어서 올라갈 수 있는 구조)
-         */
-        function buildSpiralStaircaseAndMezzanine() {
-            const group = new THREE.Group();
-            const woodStepMat = new THREE.MeshStandardMaterial({ color: 0xc29563, roughness: 0.55 });
-            const metalMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.35, metalness: 0.6 });
-            const railGlassMat = new THREE.MeshPhysicalMaterial({
-                color: 0xdbeafe,
-                transparent: true,
-                opacity: 0.35,
-                roughness: 0.15
-            });
-
-            // (A) 2층 메자닌 바닥 (Y = 4.2) - 뒷쪽 및 좌측 상부 연결 발코니
-            const mezzFloorMat = new THREE.MeshStandardMaterial({ color: 0xd6cfc2, roughness: 0.7 });
-
-            // 2층 메인 상부 데크 (Z: -13.2 ~ -5.2, X: -13.2 ~ 13.2)
-            const backDeck = new THREE.Mesh(new THREE.BoxGeometry(26.4, 0.35, 8.0), mezzFloorMat);
-            backDeck.position.set(0, SPIRAL_STAIR.totalHeight - 0.175, -9.2);
-            backDeck.receiveShadow = true;
-            backDeck.castShadow = true;
-            group.add(backDeck);
-
-            // 2층 좌측 카페 상부 발코니 (X: -13.2 ~ -7.2, Z: -5.2 ~ 6.0)
-            const leftDeck = new THREE.Mesh(new THREE.BoxGeometry(6.0, 0.35, 11.2), mezzFloorMat);
-            leftDeck.position.set(-10.2, SPIRAL_STAIR.totalHeight - 0.175, 0.4);
-            leftDeck.receiveShadow = true;
-            group.add(leftDeck);
-
-            // 2층 우측 라운지 상부 발코니 (X: 6.5 ~ 13.2, Z: -5.2 ~ 6.0)
-            const rightDeck = new THREE.Mesh(new THREE.BoxGeometry(6.7, 0.35, 11.2), mezzFloorMat);
-            rightDeck.position.set(9.85, SPIRAL_STAIR.totalHeight - 0.175, 0.4);
-            rightDeck.receiveShadow = true;
-            group.add(rightDeck);
-
-            // 2층 투명 유리 난간
-            const railBack = new THREE.Mesh(new THREE.BoxGeometry(13.6, 1.0, 0.08), railGlassMat);
-            railBack.position.set(-0.4, SPIRAL_STAIR.totalHeight + 0.5, -5.25);
-            group.add(railBack);
-
-            const railLeft = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.0, 11.2), railGlassMat);
-            railLeft.position.set(-7.25, SPIRAL_STAIR.totalHeight + 0.5, 0.4);
-            group.add(railLeft);
-
-            const railRight = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.0, 11.2), railGlassMat);
-            railRight.position.set(6.55, SPIRAL_STAIR.totalHeight + 0.5, 0.4);
-            group.add(railRight);
-
-            // (B) 중앙 나선형 계단 (24단 스텝 + 중앙 기둥 + 외곽 핸드레일)
-            const { centerX, centerZ, innerRadius, outerRadius, totalHeight, startAngle, sweepAngle } = SPIRAL_STAIR;
-
-            // 중앙 원통 기둥
-            const centerPole = new THREE.Mesh(
-                new THREE.CylinderGeometry(innerRadius * 0.85, innerRadius * 0.85, totalHeight + 0.8, 20),
-                metalMat
-            );
-            centerPole.position.set(centerX, (totalHeight + 0.8) / 2, centerZ);
-            centerPole.castShadow = true;
-            group.add(centerPole);
-            addCollider(centerX - 0.85, centerX + 0.85, centerZ - 0.85, centerZ + 0.85, 0, totalHeight + 1);
-
-            const numSteps = 26;
-            const stepWidth = outerRadius - innerRadius;
-            const midRadius = (innerRadius + outerRadius) / 2;
-
-            for (let i = 0; i <= numSteps; i++) {
-                const t = i / numSteps;
-                const angle = startAngle + t * sweepAngle;
-                const y = t * totalHeight;
-
-                const stepMesh = new THREE.Mesh(
-                    new THREE.BoxGeometry(stepWidth, 0.14, 0.68),
-                    woodStepMat
-                );
-                stepMesh.position.set(
-                    centerX + Math.cos(angle) * midRadius,
-                    y,
-                    centerZ + Math.sin(angle) * midRadius
-                );
-                stepMesh.rotation.y = -angle;
-                stepMesh.castShadow = true;
-                stepMesh.receiveShadow = true;
-                group.add(stepMesh);
-
-                // 외곽 난간 기둥
-                if (i % 2 === 0) {
-                    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.95, 8), metalMat);
-                    post.position.set(
-                        centerX + Math.cos(angle) * (outerRadius - 0.08),
-                        y + 0.48,
-                        centerZ + Math.sin(angle) * (outerRadius - 0.08)
-                    );
-                    group.add(post);
-                }
-            }
-
-            // 2층 위 아기자기한 테이블/화분 소품
-            const plantPot = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.45, 0.35, 0.6, 12),
-                new THREE.MeshStandardMaterial({ color: 0xf5f5f4 })
-            );
-            plantPot.position.set(-5.5, totalHeight + 0.3, -6.5);
-            group.add(plantPot);
-
-            const plantLeaf = new THREE.Mesh(
-                new THREE.SphereGeometry(0.65, 12, 12),
-                new THREE.MeshStandardMaterial({ color: 0x65a30d })
-            );
-            plantLeaf.position.set(-5.5, totalHeight + 0.95, -6.5);
-            group.add(plantLeaf);
-
-            scene.add(group);
-        }
-
-        /**
-         * 5. 로비 주요 구역 가구 및 오브젝트 배치 (카페 코너, 컬러 푸프 라운지, 키오스크, 대형 보드)
-         */
-        function buildFurnitureAndProps() {
-            const propsGroup = new THREE.Group();
-            const oakMat = new THREE.MeshStandardMaterial({ color: 0xc89d6c, roughness: 0.55 });
-            const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x292524, roughness: 0.4, metalness: 0.5 });
-
-            // --- (1) 좌측 카페 코너 (Café Corner) ---
-            // 바리스타 카운터
-            const counter = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.05, 5.4), oakMat);
-            counter.position.set(-11.2, 0.525, -1.2);
-            counter.castShadow = true;
-            counter.receiveShadow = true;
-            propsGroup.add(counter);
-            addCollider(-12.4, -10.0, -4.0, 1.6, 0, 2);
-
-            // Café Corner 간판 보드
-            const signBoard = new THREE.Mesh(
-                new THREE.BoxGeometry(0.15, 0.75, 3.2),
-                new THREE.MeshStandardMaterial({ map: customTextures.cafeSign })
-            );
-            signBoard.position.set(-10.1, 3.25, -1.2);
-            propsGroup.add(signBoard);
-
-            // 대형 우드 커뮤니티 테이블 + 노트북 + 커피잔 + 스툴
-            const tableX = -7.8, tableZ = 1.6;
-            const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.1, 3.6), oakMat);
-            tableTop.position.set(tableX, 0.78, tableZ);
-            tableTop.castShadow = true;
-            tableTop.receiveShadow = true;
-            propsGroup.add(tableTop);
-            addCollider(tableX - 1.15, tableX + 1.15, tableZ - 2.0, tableZ + 2.0, 0, 2);
-
-            // 테이블 다리
-            [[-0.75, -1.5], [0.75, -1.5], [-0.75, 1.5], [0.75, 1.5]].forEach(([dx, dz]) => {
-                const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.78, 8), darkMetalMat);
-                leg.position.set(tableX + dx, 0.39, tableZ + dz);
-                propsGroup.add(leg);
-            });
-
-            // 테이블 위 소품 (노트북 & 테이크아웃 커피잔)
-            const laptopMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.4, roughness: 0.3 });
-            const cupMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-            [-0.9, 0.8].forEach((dz, idx) => {
-                const laptopBase = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.02, 0.32), laptopMat);
-                laptopBase.position.set(tableX - 0.35, 0.84, tableZ + dz);
-                propsGroup.add(laptopBase);
-
-                const laptopScreen = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.28, 0.32), laptopMat);
-                laptopScreen.position.set(tableX - 0.55, 0.97, tableZ + dz);
-                laptopScreen.rotation.z = 0.22;
-                propsGroup.add(laptopScreen);
-
-                const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.045, 0.14, 12), cupMat);
-                cup.position.set(tableX + 0.3, 0.9, tableZ + dz + (idx === 0 ? 0.3 : -0.3));
-                propsGroup.add(cup);
-            });
-
-            // 원목 스툴 의자들
-            [-1.0, 0.2, 1.3].forEach(dz => {
-                const stool = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.48, 14), oakMat);
-                stool.position.set(tableX + 1.15, 0.24, tableZ + dz);
-                stool.castShadow = true;
-                propsGroup.add(stool);
-            });
-
-            // --- (2) 안내 디지털 키오스크 (카페 옆 중앙 좌측) ---
-            const kioskX = -5.6, kioskZ = -3.8;
-            const kioskBody = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.95, 0.25), darkMetalMat);
-            kioskBody.position.set(kioskX, 0.975, kioskZ);
-            kioskBody.rotation.y = 0.45;
-            kioskBody.castShadow = true;
-            propsGroup.add(kioskBody);
-
-            const kioskScreen = new THREE.Mesh(
-                new THREE.PlaneGeometry(0.62, 1.15),
-                new THREE.MeshBasicMaterial({ map: customTextures.kioskScreen })
-            );
-            kioskScreen.position.set(kioskX + 0.06, 1.25, kioskZ + 0.12);
-            kioskScreen.rotation.y = 0.45;
-            propsGroup.add(kioskScreen);
-            addCollider(kioskX - 0.5, kioskX + 0.5, kioskZ - 0.5, kioskZ + 0.5, 0, 2.2);
-
-            // --- (3) 우측 라운지 컬러 푸프(Pouf) 소파 존 ---
-            const poufConfigs = [
-                { x: 7.4, z: 1.8, r: 0.72, h: 0.45, color: 0xe06d6d },  // 코랄 레드 원형 푸프
-                { x: 9.2, z: 1.5, r: 0.68, h: 0.44, color: 0xf4b942 },  // 머스타드 옐로우 푸프
-                { x: 8.2, z: 3.3, r: 0.65, h: 0.42, color: 0x4b5563 },  // 네이비 차콜 푸프
-                { x: 10.3, z: 2.9, r: 0.62, h: 0.42, color: 0x6ea8a1 }  // 세이지 민트 푸프
-            ];
-            poufConfigs.forEach(p => {
-                const pouf = new THREE.Mesh(
-                    new THREE.CylinderGeometry(p.r, p.r * 1.03, p.h, 24),
-                    new THREE.MeshStandardMaterial({ color: p.color, roughness: 0.85 })
-                );
-                pouf.position.set(p.x, p.h / 2, p.z);
-                pouf.castShadow = true;
-                pouf.receiveShadow = true;
-                propsGroup.add(pouf);
-                addCollider(p.x - p.r * 0.85, p.x + p.r * 0.85, p.z - p.r * 0.85, p.z + p.r * 0.85, 0, 1.2);
-            });
-
-            // --- (4) 우측 벽면 대형 디지털 네트워크 보드 ---
-            const bigBoard = new THREE.Mesh(
-                new THREE.BoxGeometry(0.18, 2.5, 4.4),
-                new THREE.MeshStandardMaterial({ map: customTextures.mapBoard })
-            );
-            bigBoard.position.set(13.15, 2.35, 1.2);
-            propsGroup.add(bigBoard);
-
-            // --- (5) 로비 곳곳 관엽 화분 인테리어 ---
-            const potLocations = [[-11.8, 7.5], [11.5, 7.5], [-4.2, -7.5], [11.2, -3.5]];
-            potLocations.forEach(([px, pz]) => {
-                const pot = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.45, 0.35, 0.65, 14),
-                    new THREE.MeshStandardMaterial({ color: 0xfafaf9, roughness: 0.6 })
-                );
-                pot.position.set(px, 0.325, pz);
-                pot.castShadow = true;
-                propsGroup.add(pot);
-
-                const foliage = new THREE.Mesh(
-                    new THREE.DodecahedronGeometry(0.75, 1),
-                    new THREE.MeshStandardMaterial({ color: 0x4d7c0f, roughness: 0.75 })
-                );
-                foliage.position.set(px, 1.15, pz);
-                foliage.castShadow = true;
-                propsGroup.add(foliage);
-
-                addCollider(px - 0.55, px + 0.55, pz - 0.55, pz + 0.55, 0, 2);
-            });
-
-            scene.add(propsGroup);
-        }
-
-        /**
-         * 6. 주인공 3D 캐릭터 생성
-         * - 산사절 느낌의 둥글고 귀여운 3등신 비율
-         * - 하늘색 모자, 하늘색 긴팔 맨투맨, 남색 손목 시보리, 남색 바지, 흰 신발
-         * - 목에 건 파란 랜야드 줄 + 쿠팡 사원증 (로고 & 헤드셋 없는 캐릭터 얼굴 사진)
-         * - 택배 박스 없음
-         */
-        function buildPlayerCharacter() {
-            playerGroup = new THREE.Group();
-            playerGroup.position.copy(playerState.position);
-
-            // 재질 정의
-            const skinMat = new THREE.MeshStandardMaterial({ color: 0xe09f7d, roughness: 0.65 });
-            const cheekMat = new THREE.MeshStandardMaterial({ color: 0xd97b66, roughness: 0.8 });
-            const skyBlueMat = new THREE.MeshStandardMaterial({ color: 0x8bb6db, roughness: 0.78 });
-            const capBrimMat = new THREE.MeshStandardMaterial({ color: 0x77a4cc, roughness: 0.75 });
-            const navyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.82 });
-            const shoeMat = new THREE.MeshStandardMaterial({ color: 0xf1efe9, roughness: 0.65 });
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0x292018 });
-            const strapMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 });
-
-            // 1) 다리 및 신발 (좌/우)
-            const leftLegGroup = new THREE.Group();
-            leftLegGroup.position.set(-0.22, 0.58, 0);
-            const leftPant = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.17, 0.46, 16), navyMat);
-            leftPant.position.y = -0.22;
-            leftPant.castShadow = true;
-            leftLegGroup.add(leftPant);
-
-            const leftShoe = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 12), shoeMat);
-            leftShoe.scale.set(1.0, 0.72, 1.32);
-            leftShoe.position.set(0, -0.45, 0.05);
-            leftShoe.castShadow = true;
-            leftLegGroup.add(leftShoe);
-            playerGroup.add(leftLegGroup);
-            playerParts.leftLeg = leftLegGroup;
-
-            const rightLegGroup = new THREE.Group();
-            rightLegGroup.position.set(0.22, 0.58, 0);
-            const rightPant = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.17, 0.46, 16), navyMat);
-            rightPant.position.y = -0.22;
-            rightPant.castShadow = true;
-            rightLegGroup.add(rightPant);
-
-            const rightShoe = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 12), shoeMat);
-            rightShoe.scale.set(1.0, 0.72, 1.32);
-            rightShoe.position.set(0, -0.45, 0.05);
-            rightShoe.castShadow = true;
-            rightLegGroup.add(rightShoe);
-            playerGroup.add(rightLegGroup);
-            playerParts.rightLeg = rightLegGroup;
-
-            // 2) 몸통 (하늘색 긴팔 스웨트셔츠)
-            const bodyGroup = new THREE.Group();
-            bodyGroup.position.set(0, 1.05, 0);
-
-            const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.50, 0.88, 24), skyBlueMat);
-            torso.castShadow = true;
-            torso.receiveShadow = true;
-            bodyGroup.add(torso);
-
-            // 밑단 시보리 밴드
-            const hemBand = new THREE.Mesh(new THREE.TorusGeometry(0.49, 0.055, 10, 24), skyBlueMat);
-            hemBand.rotation.x = Math.PI / 2;
-            hemBand.position.y = -0.42;
-            bodyGroup.add(hemBand);
-
-            // 목 칼라
-            const collar = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.05, 10, 20), skyBlueMat);
-            collar.rotation.x = Math.PI / 2;
-            collar.position.y = 0.43;
-            bodyGroup.add(collar);
-
-            // 3) 쿠팡 사원증 목걸이 (랜야드 줄 + 투명 케이스 ID 카드)
-            const lanyardLeft = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.48, 0.015), strapMat);
-            lanyardLeft.position.set(-0.11, 0.24, 0.46);
-            lanyardLeft.rotation.z = -0.24;
-            lanyardLeft.rotation.x = -0.1;
-            bodyGroup.add(lanyardLeft);
-
-            const lanyardRight = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.48, 0.015), strapMat);
-            lanyardRight.position.set(0.11, 0.24, 0.46);
-            lanyardRight.rotation.z = 0.24;
-            lanyardRight.rotation.x = -0.1;
-            bodyGroup.add(lanyardRight);
-
-            // 금속 클립
-            const clip = new THREE.Mesh(
-                new THREE.BoxGeometry(0.05, 0.08, 0.03),
-                new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.8, roughness: 0.2 })
-            );
-            clip.position.set(0, 0.02, 0.49);
-            bodyGroup.add(clip);
-
-            // 사원증 카드 본체
-            const badgeMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(0.26, 0.38, 0.02),
-                new THREE.MeshStandardMaterial({ map: customTextures.idBadge, roughness: 0.35 })
-            );
-            badgeMesh.position.set(0, -0.19, 0.50);
-            badgeMesh.rotation.x = -0.06;
-            badgeMesh.castShadow = true;
-            bodyGroup.add(badgeMesh);
-            playerParts.badge = badgeMesh;
-
-            // 4) 양팔 (하늘색 긴팔 + 남색 끝소매 시보리 + 귀여운 손)
-            function createArm(isLeft) {
-                const sign = isLeft ? -1 : 1;
-                const armPivot = new THREE.Group();
-                armPivot.position.set(sign * 0.48, 0.30, 0);
-
-                // 팔통
-                const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.13, 0.48, 16), skyBlueMat);
-                sleeve.position.set(sign * 0.08, -0.22, 0);
-                sleeve.rotation.z = sign * 0.22;
-                sleeve.castShadow = true;
-                armPivot.add(sleeve);
-
-                // 남색 손목 시보리 (원본 캐릭터의 핵심 디테일)
-                const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.138, 0.132, 0.11, 16), navyMat);
-                cuff.position.set(sign * 0.14, -0.45, 0);
-                cuff.rotation.z = sign * 0.22;
-                cuff.castShadow = true;
-                armPivot.add(cuff);
-
-                // 둥근 손
-                const hand = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 14), skinMat);
-                hand.position.set(sign * 0.17, -0.57, 0.02);
-                hand.castShadow = true;
-                armPivot.add(hand);
-
-                return armPivot;
-            }
-
-            playerParts.leftArm = createArm(true);
-            playerParts.rightArm = createArm(false);
-            bodyGroup.add(playerParts.leftArm);
-            bodyGroup.add(playerParts.rightArm);
-
-            // 5) 머리 + 얼굴 표정 + 하늘색 창모자 (헤드셋 없음)
-            const headGroup = new THREE.Group();
-            headGroup.position.set(0, 0.92, 0);
-
-            const headSphere = new THREE.Mesh(new THREE.SphereGeometry(0.56, 28, 24), skinMat);
-            headSphere.scale.set(1.04, 0.98, 0.98);
-            headSphere.castShadow = true;
-            headGroup.add(headSphere);
-
-            // 귀여운 코
-            const nose = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), skinMat);
-            nose.position.set(0, -0.04, 0.54);
-            headGroup.add(nose);
-
-            // 양 볼 홍조
-            const leftCheek = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 12), cheekMat);
-            leftCheek.scale.set(1.2, 0.8, 0.3);
-            leftCheek.position.set(-0.27, -0.10, 0.47);
-            headGroup.add(leftCheek);
-
-            const rightCheek = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 12), cheekMat);
-            rightCheek.scale.set(1.2, 0.8, 0.3);
-            rightCheek.position.set(0.27, -0.10, 0.47);
-            headGroup.add(rightCheek);
-
-            // 눈 (까만 동그라미)
-            const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.042, 12, 12), eyeMat);
-            leftEye.position.set(-0.17, 0.02, 0.52);
-            headGroup.add(leftEye);
-
-            const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.042, 12, 12), eyeMat);
-            rightEye.position.set(0.17, 0.02, 0.52);
-            headGroup.add(rightEye);
-
-            // 온화한 미소 입
-            const smileCurve = new THREE.TorusGeometry(0.10, 0.018, 8, 16, Math.PI * 0.78);
-            const smileMesh = new THREE.Mesh(smileCurve, eyeMat);
-            smileMesh.position.set(0, -0.13, 0.51);
-            smileMesh.rotation.z = Math.PI * 1.11;
-            headGroup.add(smileMesh);
-
-            // 하늘색 볼캡(창모자) 크라운
-            const capCrown = new THREE.Mesh(
-                new THREE.SphereGeometry(0.575, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.52),
-                skyBlueMat
-            );
-            capCrown.position.set(0, 0.04, 0);
-            capCrown.rotation.x = -0.08;
-            capCrown.castShadow = true;
-            headGroup.add(capCrown);
-
-            // 모자 꼭지 버튼
-            const capButton = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), capBrimMat);
-            capButton.position.set(0, 0.61, -0.04);
-            headGroup.add(capButton);
-
-            // 모자 앞챙(Brim)
-            const brimGeo = new THREE.CylinderGeometry(0.46, 0.50, 0.035, 24, 1, false, -Math.PI * 0.45, Math.PI * 0.9);
-            const brimMesh = new THREE.Mesh(brimGeo, capBrimMat);
-            brimMesh.position.set(0, 0.14, 0.36);
-            brimMesh.rotation.x = 0.14;
-            brimMesh.castShadow = true;
-            headGroup.add(brimMesh);
-
-            bodyGroup.add(headGroup);
-            playerParts.body = bodyGroup;
-            playerParts.head = headGroup;
-
-            playerGroup.add(bodyGroup);
-            scene.add(playerGroup);
-        }
-
-        /**
-         * 7. 로비 속 동료 NPC 사원들 생성 (카페 대화, 라운지 휴식, 로비 인사)
-         */
-        function spawnNPCCoworkers() {
-            const npcConfigs = [
-                {
-                    name: '김민수 매니저',
-                    x: -6.1, y: 0, z: 1.5, rotY: Math.PI * 0.5,
-                    shirtColor: 0x6ea87a, pantColor: 0x334155, hairColor: 0x292524,
-                    phrases: ['오늘 커피 향이 정말 좋네요 ☕', '점심 식사 맛있게 하셨어요?', '로비 햇살이 따뜻해서 산책하기 딱이에요!']
-                },
-                {
-                    name: '이지은 디자이너',
-                    x: 8.3, y: 0, z: 0.6, rotY: Math.PI * 0.95,
-                    shirtColor: 0xe89b72, pantColor: 0x475569, hairColor: 0x4a2c18,
-                    phrases: ['라운지 소파가 새로 들어왔대요 ✨', '잠깐 쉬면서 아이디어 정리 중이에요!', '반가워요! 오늘도 화이팅입니다 😊']
-                },
-                {
-                    name: '박현우 엔지니어',
-                    x: -3.2, y: 0, z: -2.8, rotY: 0.35,
-                    shirtColor: 0x7c93c3, pantColor: 0x1e293b, hairColor: 0x1c1917,
-                    phrases: ['나선형 계단 위로 올라가면 2층 뷰가 멋져요!', '새 사원증 디자인 깔끔하네요 👍', '사내 현황 보드도 한번 구경해 보세요!']
-                },
-                {
-                    name: '최서연 PM',
-                    x: -1.5, y: 4.2, z: -6.2, rotY: 0,
-                    shirtColor: 0xd9a05b, pantColor: 0x374151, hairColor: 0x3f2314,
-                    phrases: ['2층 발코니까지 올라오셨네요! 환영해요 🎉', '위에서 내려다보는 로비 풍경이 참 여유롭죠?']
-                }
-            ];
-
-            const overlayLayer = document.getElementById('overlay-layer');
-
-            npcConfigs.forEach((cfg, idx) => {
-                const npcGroup = new THREE.Group();
-                npcGroup.position.set(cfg.x, cfg.y, cfg.z);
-                npcGroup.rotation.y = cfg.rotY;
-
-                const skinMat = new THREE.MeshStandardMaterial({ color: 0xe3a887, roughness: 0.65 });
-                const shirtMat = new THREE.MeshStandardMaterial({ color: cfg.shirtColor, roughness: 0.8 });
-                const pantMat = new THREE.MeshStandardMaterial({ color: cfg.pantColor, roughness: 0.8 });
-                const hairMat = new THREE.MeshStandardMaterial({ color: cfg.hairColor, roughness: 0.85 });
-
-                // 다리
-                [-0.18, 0.18].forEach(lx => {
-                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.14, 0.55, 12), pantMat);
-                    leg.position.set(lx, 0.28, 0);
-                    leg.castShadow = true;
-                    npcGroup.add(leg);
-                });
-
-                // 몸통
-                const body = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.42, 0.8, 18), shirtMat);
-                body.position.y = 0.95;
-                body.castShadow = true;
-                npcGroup.add(body);
-
-                // 팔
-                [-0.44, 0.44].forEach((ax, i) => {
-                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.10, 0.52, 12), shirtMat);
-                    arm.position.set(ax, 0.96, 0);
-                    arm.rotation.z = i === 0 ? -0.2 : 0.2;
-                    npcGroup.add(arm);
-                });
-
-                // 머리 & 헤어
-                const headGroup = new THREE.Group();
-                headGroup.position.y = 1.75;
-                const head = new THREE.Mesh(new THREE.SphereGeometry(0.46, 20, 18), skinMat);
-                head.castShadow = true;
-                headGroup.add(head);
-
-                const hair = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.48, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.56),
-                    hairMat
-                );
-                hair.rotation.x = -0.25;
-                headGroup.add(hair);
-
-                // 눈
-                const eyeMat = new THREE.MeshBasicMaterial({ color: 0x221c18 });
-                [-0.14, 0.14].forEach(ex => {
-                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), eyeMat);
-                    eye.position.set(ex, 0.02, 0.43);
-                    headGroup.add(eye);
-                });
-
-                npcGroup.add(headGroup);
-                scene.add(npcGroup);
-
-                // NPC 충돌체 추가
-                addCollider(cfg.x - 0.55, cfg.x + 0.55, cfg.z - 0.55, cfg.z + 0.55, cfg.y, cfg.y + 2.2);
-
-                // HTML 말풍선 엘리먼트 생성
-                const bubbleWrapper = document.createElement('div');
-                bubbleWrapper.className = 'floating-label hidden';
-                bubbleWrapper.innerHTML = `
-                    <div class="npc-bubble">
-                        <span class="font-bold text-sky-700 mr-1">${cfg.name}</span>
-                        <span class="npc-msg">${cfg.phrases[0]}</span>
-                    </div>
-                `;
-                overlayLayer.appendChild(bubbleWrapper);
-
-                npcs.push({
-                    group: npcGroup,
-                    head: headGroup,
-                    el: bubbleWrapper,
-                    msgEl: bubbleWrapper.querySelector('.npc-msg'),
-                    phrases: cfg.phrases,
-                    phraseIdx: 0,
-                    timer: idx * 2.1,
-                    basePos: new THREE.Vector3(cfg.x, cfg.y, cfg.z)
-                });
-            });
-        }
-
-        /**
-         * 8. 로비 랜드마크 구역 트리거 설정 (다가가면 좌측 카드에 공간 설명 표시)
-         */
-        function setupLandmarks() {
-            landmarks.push(
-                {
-                    id: 'cafe',
-                    badge: 'CAFÉ CORNER',
-                    floor: '1F 좌측 창가',
-                    title: '사내 카페 코너 (Café Corner)',
-                    text: '통유리창으로 들어오는 자연광 아래 커피를 마시며 자유롭게 협업하는 라운지 테이블입니다.',
-                    pos: new THREE.Vector3(-8.2, 0, 1.0),
-                    radius: 3.6
-                },
-                {
-                    id: 'kiosk',
-                    badge: 'SMART KIOSK',
-                    floor: '1F 로비 중앙',
-                    title: '스마트 안내 키오스크',
-                    text: '층별 안내와 방문 체크인을 지원하는 터치스크린 키오스크입니다.',
-                    pos: new THREE.Vector3(-5.2, 0, -3.5),
-                    radius: 2.6
-                },
-                {
-                    id: 'stairs',
-                    badge: 'SPIRAL STAIRCASE',
-                    floor: '1F ↔ 2F 연결',
-                    title: '중앙 나선형 계단',
-                    text: '계단을 따라 걸어 올라가면 2층 메자닌 발코니에서 로비 전체를 한눈에 내려다볼 수 있습니다.',
-                    pos: new THREE.Vector3(2.8, 0, -2.5),
-                    radius: 3.2
-                },
-                {
-                    id: 'lounge',
-                    badge: 'LOUNGE ZONE',
-                    floor: '1F 우측 휴게존',
-                    title: '컬러 푸프 소파 라운지',
-                    text: '알록달록한 원형 푸프 소파에 둘러앉아 동료들과 가볍게 대화를 나누는 휴식 공간입니다.',
-                    pos: new THREE.Vector3(8.6, 0, 2.2),
-                    radius: 3.4
-                },
-                {
-                    id: 'board',
-                    badge: 'NETWORK BOARD',
-                    floor: '1F 우측 벽면',
-                    title: 'COUPANG',
-                    text: '쿠팡없이 어떻게 살았을까',
-                    pos: new THREE.Vector3(11.6, 0, 1.2),
-                    radius: 3.0
-                },
-                {
-                    id: 'mezzanine',
-                    badge: '2F MEZZANINE',
-                    floor: '2F 오픈 발코니',
-                    title: '2층 메자닌 전망 발코니',
-                    text: '높은 층고의 우드 천장과 로비 전경이 어우러지는 2층 산책 구역입니다.',
-                    pos: new THREE.Vector3(-1.5, 4.2, -6.8),
-                    radius: 4.5
-                }
-            );
-        }
-
-        /**
-         * 9. 충돌 박스 등록 및 지형(1층 바닥 / 나선형 계단 / 2층 발코니) 높이 계산
-         */
-        function addCollider(minX, maxX, minZ, maxZ, minY, maxY) {
-            colliders.push({ minX, maxX, minZ, maxZ, minY, maxY });
-        }
-
-        // 주어진 (x, z) 좌표와 현재 높이(currentY)를 기준으로 유효한 바닥 높이를 반환
-        function getWalkableHeight(x, z, currentY) {
-            const { centerX, centerZ, innerRadius, outerRadius, totalHeight, startAngle, sweepAngle } = SPIRAL_STAIR;
-            const dx = x - centerX;
-            const dz = z - centerZ;
-            const distFromStair = Math.hypot(dx, dz);
-
-            // 1) 나선형 계단 영역 판별
-            if (distFromStair >= innerRadius * 0.85 && distFromStair <= outerRadius + 0.25) {
-                let angle = Math.atan2(dz, dx);
-                // 각도를 startAngle 기준으로 정규화
-                while (angle < startAngle - 0.35) angle += Math.PI * 2;
-                while (angle > startAngle + Math.PI * 2 - 0.35) angle -= Math.PI * 2;
-
-                const t = (angle - startAngle) / sweepAngle;
-                if (t >= -0.08 && t <= 1.08) {
-                    const clampedT = Math.max(0, Math.min(1, t));
-                    const stairY = clampedT * totalHeight;
-                    if (Math.abs(stairY - currentY) < 1.15) {
-                        return stairY;
-                    }
-                }
-            }
-
-            // 2) 2층 메자닌 바닥 영역 판별 (현재 높이가 2층 부근일 때)
-            if (currentY > totalHeight - 0.85) {
-                const inBackDeck = (x >= -12.8 && x <= 12.8 && z >= -12.8 && z <= -5.5);
-                const inLeftDeck = (x >= -12.8 && x <= -7.6 && z >= -5.5 && z <= 5.6);
-                const inRightDeck = (x >= 6.9 && x <= 12.8 && z >= -5.5 && z <= 5.6);
-                if (inBackDeck || inLeftDeck || inRightDeck) {
-                    return totalHeight;
-                }
-                return null; // 2층 난간 밖 추락 방지
-            }
-
-            // 3) 1층 로비 바닥 경계
-            if (x >= -12.6 && x <= 12.6 && z >= -12.6 && z <= 12.6) {
-                return 0;
-            }
-
-            return null;
-        }
-
-        function checkCollision(nx, ny, nz) {
-            const r = 0.42; // 캐릭터 반지름
-            for (let i = 0; i < colliders.length; i++) {
-                const c = colliders[i];
-                if (ny + 1.5 > c.minY && ny + 0.1 < c.maxY) {
-                    if (nx + r > c.minX && nx - r < c.maxX && nz + r > c.minZ && nz - r < c.maxZ) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        /**
-         * 10. 키보드, 마우스 드래그 시점, 터치 조이스틱 및 UI 버튼 이벤트
-         */
-        function setupInputsAndUI() {
-            // 키보드 이벤트
-            window.addEventListener('keydown', (e) => {
-                if (e.key in keys) keys[e.key] = true;
-                const lower = e.key.toLowerCase();
-                if (lower in keys) keys[lower] = true;
-            });
-            window.addEventListener('keyup', (e) => {
-                if (e.key in keys) keys[e.key] = false;
-                const lower = e.key.toLowerCase();
-                if (lower in keys) keys[lower] = false;
-            });
-
-            // 마우스 드래그 카메라 회전 & 휠 줌
-            const domElem = renderer.domElement;
-            domElem.addEventListener('mousedown', (e) => {
-                cameraControl.isDragging = true;
-                cameraControl.prevMouseX = e.clientX;
-                cameraControl.prevMouseY = e.clientY;
-            });
-            window.addEventListener('mouseup', () => {
-                cameraControl.isDragging = false;
-            });
-            window.addEventListener('mousemove', (e) => {
-                if (!cameraControl.isDragging) return;
-                const deltaX = e.clientX - cameraControl.prevMouseX;
-                const deltaY = e.clientY - cameraControl.prevMouseY;
-                cameraControl.prevMouseX = e.clientX;
-                cameraControl.prevMouseY = e.clientY;
-
-                cameraControl.yaw -= deltaX * 0.0065;
-                cameraControl.pitch = Math.max(0.08, Math.min(1.15, cameraControl.pitch + deltaY * 0.005));
-            });
-
-            domElem.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                cameraControl.distance = Math.max(
-                    cameraControl.minDistance,
-                    Math.min(cameraControl.maxDistance, cameraControl.distance + e.deltaY * 0.006)
-                );
-            }, { passive: false });
-
-            // 터치 한 손가락 카메라 회전 지원
-            let touchCamId = null;
-            domElem.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    touchCamId = e.touches[0].identifier;
-                    cameraControl.prevMouseX = e.touches[0].clientX;
-                    cameraControl.prevMouseY = e.touches[0].clientY;
-                }
-            }, { passive: true });
-            domElem.addEventListener('touchmove', (e) => {
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    const t = e.changedTouches[i];
-                    if (t.identifier === touchCamId) {
-                        const dx = t.clientX - cameraControl.prevMouseX;
-                        const dy = t.clientY - cameraControl.prevMouseY;
-                        cameraControl.prevMouseX = t.clientX;
-                        cameraControl.prevMouseY = t.clientY;
-                        cameraControl.yaw -= dx * 0.0075;
-                        cameraControl.pitch = Math.max(0.08, Math.min(1.15, cameraControl.pitch + dy * 0.006));
-                    }
-                }
-            }, { passive: true });
-
-            // 가상 조이스틱 제어 (터치 & 마우스 클릭 모두 대응)
-            const joyZone = document.getElementById('joystick-zone');
-            const joyKnob = document.getElementById('joystick-knob');
-            const maxRadius = 38;
-
-            function updateJoystick(clientX, clientY) {
-                const rect = joyZone.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                let dx = clientX - centerX;
-                let dy = clientY - centerY;
-                const dist = Math.hypot(dx, dy);
-                if (dist > maxRadius) {
-                    dx = (dx / dist) * maxRadius;
-                    dy = (dy / dist) * maxRadius;
-                }
-                joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-                joystickInput.x = dx / maxRadius;
-                joystickInput.y = dy / maxRadius;
-            }
-
-            function resetJoystick() {
-                joystickInput.active = false;
-                joystickInput.x = 0;
-                joystickInput.y = 0;
-                joyKnob.style.transform = `translate(0px, 0px)`;
-            }
-
-            joyZone.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-                joystickInput.active = true;
-                updateJoystick(e.clientX, e.clientY);
-            });
-            window.addEventListener('mousemove', (e) => {
-                if (joystickInput.active) updateJoystick(e.clientX, e.clientY);
-            });
-            window.addEventListener('mouseup', () => {
-                if (joystickInput.active) resetJoystick();
-            });
-
-            joyZone.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                joystickInput.active = true;
-                const t = e.touches[0];
-                updateJoystick(t.clientX, t.clientY);
-            }, { passive: true });
-            joyZone.addEventListener('touchmove', (e) => {
-                if (!joystickInput.active) return;
-                const t = e.touches[0];
-                updateJoystick(t.clientX, t.clientY);
-            }, { passive: true });
-            joyZone.addEventListener('touchend', resetJoystick);
-
-            // 발걸음 속도 토글 버튼 ('NEWBIE' <-> 'LEVEL1' <-> '경쾌한 발걸음')
-            const paceBtn = document.getElementById('toggle-pace-btn');
-            paceBtn.addEventListener('click', () => {
-                playerState.paceIndex = (playerState.paceIndex + 1) % PACE_MODES.length;
-                const mode = PACE_MODES[playerState.paceIndex];
-                document.getElementById('pace-label-text').textContent = mode.label;
-                document.getElementById('pace-btn-text').textContent = mode.label;
-                document.getElementById('pace-icon').textContent = mode.icon;
-            });
-
-            // 로비 중앙 위치 초기화 버튼
-            document.getElementById('reset-pos-btn').addEventListener('click', () => {
-                playerState.position.set(0, 0, 4);
-                playerState.rotationY = Math.PI;
-                cameraControl.yaw = 0;
-            });
-
-            // 시점 각도 프리셋 버튼
-            const presets = [
-                { pitch: 0.32, dist: 7.5 },
-                { pitch: 0.65, dist: 11.5 }, // 로비 조감도 뷰
-                { pitch: 0.18, dist: 5.0 }   // 캐릭터 근접 산책 뷰
-            ];
-            document.getElementById('camera-preset-btn').addEventListener('click', () => {
-                cameraControl.presetIndex = (cameraControl.presetIndex + 1) % presets.length;
-                cameraControl.pitch = presets[cameraControl.presetIndex].pitch;
-                cameraControl.distance = presets[cameraControl.presetIndex].dist;
-            });
-        }
-
-        /**
-         * 11. 프레임 업데이트: 플레이어 이동, 애니메이션, 카메라 추적, 2D 오버레이 투영
-         */
-        function updatePlayer(dt) {
-            // 입력 벡터 계산 (카메라 방향 기준)
-            let forwardInput = 0;
-            let rightInput = 0;
-
-            if (keys.w || keys.ArrowUp) forwardInput += 1;
-            if (keys.s || keys.ArrowDown) forwardInput -= 1;
-            if (keys.d || keys.ArrowRight) rightInput += 1;
-            if (keys.a || keys.ArrowLeft) rightInput -= 1;
-
-            if (Math.abs(joystickInput.x) > 0.08 || Math.abs(joystickInput.y) > 0.08) {
-                rightInput += joystickInput.x;
-                forwardInput -= joystickInput.y;
-            }
-
-            const inputLen = Math.hypot(forwardInput, rightInput);
-            const mode = PACE_MODES[playerState.paceIndex];
-
-            if (inputLen > 0.05) {
-                playerState.isMoving = true;
-                forwardInput /= Math.max(1, inputLen);
-                rightInput /= Math.max(1, inputLen);
-
-                // 카메라 yaw 각도에 맞춰 월드 이동 방향 계산
-                const sinYaw = Math.sin(cameraControl.yaw);
-                const cosYaw = Math.cos(cameraControl.yaw);
-
-                const moveX = rightInput * cosYaw - forwardInput * sinYaw;
-                const moveZ = -rightInput * sinYaw - forwardInput * cosYaw;
-
-                const stepDist = mode.speed * dt;
-                const nextX = playerState.position.x + moveX * stepDist;
-                const nextZ = playerState.position.z + moveZ * stepDist;
-
-                // X축 / Z축 슬라이딩 충돌 및 층별 바닥 높이 검증
-                const heightBoth = getWalkableHeight(nextX, nextZ, playerState.position.y);
-                if (heightBoth !== null && !checkCollision(nextX, heightBoth, nextZ)) {
-                    playerState.position.x = nextX;
-                    playerState.position.z = nextZ;
-                    playerState.position.y = THREE.MathUtils.lerp(playerState.position.y, heightBoth, 0.35);
-                } else {
-                    const heightX = getWalkableHeight(nextX, playerState.position.z, playerState.position.y);
-                    if (heightX !== null && !checkCollision(nextX, heightX, playerState.position.z)) {
-                        playerState.position.x = nextX;
-                        playerState.position.y = THREE.MathUtils.lerp(playerState.position.y, heightX, 0.35);
-                    }
-                    const heightZ = getWalkableHeight(playerState.position.x, nextZ, playerState.position.y);
-                    if (heightZ !== null && !checkCollision(playerState.position.x, heightZ, nextZ)) {
-                        playerState.position.z = nextZ;
-                        playerState.position.y = THREE.MathUtils.lerp(playerState.position.y, heightZ, 0.35);
-                    }
-                }
-
-                // 목표 방향을 향해 부드럽게 캐릭터 회전
-                const targetRot = Math.atan2(moveX, moveZ);
-                let diff = targetRot - playerState.rotationY;
-                while (diff < -Math.PI) diff += Math.PI * 2;
-                while (diff > Math.PI) diff -= Math.PI * 2;
-                playerState.rotationY += diff * Math.min(1, dt * 12);
-            } else {
-                playerState.isMoving = false;
-            }
-
-            // 걷기 바운스 & 팔다리 스윙 애니메이션
-            if (playerState.isMoving) {
-                playerState.walkCycle += dt * mode.bobFreq;
-                const swing = Math.sin(playerState.walkCycle);
-                const bob = Math.abs(Math.cos(playerState.walkCycle)) * 0.08;
-
-                playerParts.body.position.y = 1.05 + bob;
-                playerParts.leftLeg.rotation.x = swing * 0.55;
-                playerParts.rightLeg.rotation.x = -swing * 0.55;
-                playerParts.leftArm.rotation.x = -swing * 0.45;
-                playerParts.rightArm.rotation.x = swing * 0.45;
-                playerParts.head.rotation.z = Math.sin(playerState.walkCycle * 0.5) * 0.04;
-                playerParts.badge.rotation.z = Math.sin(playerState.walkCycle) * 0.08;
-            } else {
-                // 정지 상태의 잔잔한 숨쉬기(Idle) 모션
-                const idleTime = clock.getElapsedTime();
-                playerParts.body.position.y = 1.05 + Math.sin(idleTime * 2.2) * 0.02;
-                playerParts.leftLeg.rotation.x = THREE.MathUtils.lerp(playerParts.leftLeg.rotation.x, 0, dt * 8);
-                playerParts.rightLeg.rotation.x = THREE.MathUtils.lerp(playerParts.rightLeg.rotation.x, 0, dt * 8);
-                playerParts.leftArm.rotation.x = THREE.MathUtils.lerp(playerParts.leftArm.rotation.x, 0, dt * 8);
-                playerParts.rightArm.rotation.x = THREE.MathUtils.lerp(playerParts.rightArm.rotation.x, 0, dt * 8);
-                playerParts.head.rotation.z = Math.sin(idleTime * 1.4) * 0.03;
-                playerParts.badge.rotation.z = THREE.MathUtils.lerp(playerParts.badge.rotation.z, 0, dt * 8);
-            }
-
-            playerGroup.position.copy(playerState.position);
-            playerGroup.rotation.y = playerState.rotationY;
-
-            // 층수 표시 업데이트
-            const newFloor = playerState.position.y > 2.2 ? 2 : 1;
-            if (newFloor !== playerState.currentFloor) {
-                playerState.currentFloor = newFloor;
-                document.getElementById('current-zone-desc').textContent =
-                    newFloor === 2
-                        ? '2층 메자닌 오픈 발코니입니다. 로비 전체의 따뜻한 풍경을 내려다보세요.'
-                        : '따스한 햇살이 드는 1층 메인 로비입니다. 자유롭게 걸어 다니며 공간을 둘러보세요.';
-            }
-        }
-
-        function updateCamera() {
-            const targetFocus = new THREE.Vector3(
-                playerState.position.x,
-                playerState.position.y + 1.55,
-                playerState.position.z
-            );
-
-            const horizDist = Math.cos(cameraControl.pitch) * cameraControl.distance;
-            const vertDist = Math.sin(cameraControl.pitch) * cameraControl.distance;
-
-            const desiredCamPos = new THREE.Vector3(
-                targetFocus.x + Math.sin(cameraControl.yaw) * horizDist,
-                targetFocus.y + vertDist,
-                targetFocus.z + Math.cos(cameraControl.yaw) * horizDist
-            );
-
-            // 카메라가 바닥이나 벽 뒤로 너무 파고들지 않도록 높이 제한
-            desiredCamPos.y = Math.max(0.8, desiredCamPos.y);
-
-            camera.position.lerp(desiredCamPos, 0.14);
-            camera.lookAt(targetFocus);
-        }
-
-        /**
-         * 12. 3D 좌표를 2D 화면 좌표로 변환하여 머리 위 이름표, NPC 말풍선, 랜드마크 카드 갱신
-         */
-        function projectToScreen(worldVec) {
-            const v = worldVec.clone().project(camera);
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            return {
-                x: (v.x * 0.5 + 0.5) * width,
-                y: (-v.y * 0.5 + 0.5) * height,
-                visible: v.z < 1
-            };
-        }
-
-        function updateUIAndInteractions(dt) {
-            // (1) 플레이어 머리 위 상태 알약 ('NEWBIE') 위치 동기화
-            const headTopPos = new THREE.Vector3(
-                playerState.position.x,
-                playerState.position.y + 2.68,
-                playerState.position.z
-            );
-            const pScreen = projectToScreen(headTopPos);
-            const playerTag = document.getElementById('player-tag');
-            if (pScreen.visible) {
-                playerTag.style.left = `${pScreen.x}px`;
-                playerTag.style.top = `${pScreen.y}px`;
-                playerTag.style.opacity = '1';
-            } else {
-                playerTag.style.opacity = '0';
-            }
-
-            // (2) NPC 사원 근접 시 말풍선 표시 및 고개 끄덕임
-            const elapsed = clock.getElapsedTime();
-            npcs.forEach((npc, i) => {
-                npc.head.rotation.y = Math.sin(elapsed * 1.5 + i) * 0.15;
-                npc.timer += dt;
-                if (npc.timer > 5.5) {
-                    npc.timer = 0;
-                    npc.phraseIdx = (npc.phraseIdx + 1) % npc.phrases.length;
-                    npc.msgEl.textContent = npc.phrases[npc.phraseIdx];
-                }
-
-                const dist = playerState.position.distanceTo(npc.basePos);
-                if (dist < 4.5) {
-                    const npcHeadPos = new THREE.Vector3(npc.basePos.x, npc.basePos.y + 2.38, npc.basePos.z);
-                    const s = projectToScreen(npcHeadPos);
-                    if (s.visible) {
-                        npc.el.classList.remove('hidden');
-                        npc.el.style.left = `${s.x}px`;
-                        npc.el.style.top = `${s.y}px`;
-                    } else {
-                        npc.el.classList.add('hidden');
-                    }
-                } else {
-                    npc.el.classList.add('hidden');
-                }
-            });
-
-            // (3) 로비 랜드마크 근접 탐방 카드 표시
-            let nearestLandmark = null;
-            let minLandmarkDist = Infinity;
-
-            landmarks.forEach(lm => {
-                const d = playerState.position.distanceTo(lm.pos);
-                if (d < lm.radius && d < minLandmarkDist) {
-                    minLandmarkDist = d;
-                    nearestLandmark = lm;
-                }
-            });
-
-            const card = document.getElementById('landmark-card');
-            if (nearestLandmark) {
-                card.classList.remove('hidden');
-                document.getElementById('landmark-badge').textContent = nearestLandmark.badge;
-                document.getElementById('landmark-floor').textContent = nearestLandmark.floor;
-                document.getElementById('landmark-title').textContent = nearestLandmark.title;
-                document.getElementById('landmark-text').textContent = nearestLandmark.text;
-            } else {
-                card.classList.add('hidden');
-            }
-        }
-
-        // 메인 애니메이션 루프
-        function animate() {
-            requestAnimationFrame(animate);
-            const dt = Math.min(clock.getDelta(), 0.05);
-
-            updatePlayer(dt);
-            updateCamera();
-            updateUIAndInteractions(dt);
-
-            renderer.render(scene, camera);
-        }
-    </script>
-</body>
-</html>
