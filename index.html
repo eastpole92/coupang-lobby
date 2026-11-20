@@ -153,6 +153,11 @@
                             <option value="육식">육식</option>
                             <option value="채식">채식</option>
                         </select>
+                        <select id="board-country-select" class="hidden w-20 px-2 py-1.5 text-xs bg-white border border-stone-300 rounded-lg focus:outline-none focus:border-sky-500 text-stone-800 font-semibold">
+                            <option value="한국">한국</option>
+                            <option value="대만">대만</option>
+                            <option value="일본">일본</option>
+                        </select>
                         <input id="board-nick-input" type="text" maxlength="10" placeholder="닉네임" class="w-24 px-2.5 py-1.5 text-xs bg-white border border-stone-300 rounded-lg focus:outline-none focus:border-sky-500 text-stone-800 select-text" />
                         <input id="board-msg-input" type="text" maxlength="32" placeholder="게시판에 남길 메시지를 입력하세요" class="flex-1 min-w-0 px-2.5 py-1.5 text-xs bg-white border border-stone-300 rounded-lg focus:outline-none focus:border-sky-500 text-stone-800 select-text" />
                     </div>
@@ -290,9 +295,29 @@
                     cardBg: '#f0fdf4',
                     items: ['두부 스테이크 & 구운 채소', '리코타 치즈 & 계절과일 샐러드', '들깨 버섯순두부 & 현미밥']
                 }
+            ],
+            globalStatus: [
+                {
+                    country: '한국',
+                    accent: '#38bdf8',
+                    headerBg: 'rgba(2, 132, 199, 0.55)',
+                    summary: '로켓배송 · 물류센터 100+ 거점 정상 운영'
+                },
+                {
+                    country: '대만',
+                    accent: '#facc15',
+                    headerBg: 'rgba(202, 138, 4, 0.52)',
+                    summary: '로켓직구 · 타이베이 허브 정상 운영'
+                },
+                {
+                    country: '일본',
+                    accent: '#4ade80',
+                    headerBg: 'rgba(22, 163, 74, 0.52)',
+                    summary: '도쿄 · 수도권 글로벌 네트워크 운영'
+                }
             ]
         };
-        let blindCanvas, blindCtx, dangpangCanvas, dangpangCtx, menuCanvas, menuCtx;
+        let blindCanvas, blindCtx, dangpangCanvas, dangpangCtx, menuCanvas, menuCtx, globalCanvas, globalCtx;
 
         function escapeHtml(str) {
             return String(str)
@@ -306,6 +331,16 @@
         function renderBoardPostList(boardId) {
             const listEl = document.getElementById('board-post-list');
             if (!listEl) return;
+
+            if (boardId === 'board') {
+                listEl.innerHTML = boardData.globalStatus.map(item => `
+                    <div class="bg-slate-900/95 border border-sky-400/50 rounded-xl px-2.5 py-1.5 shadow-sm flex items-center gap-2">
+                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-sky-500/20 shrink-0" style="color:${item.accent}">${escapeHtml(item.country)}</span>
+                        <span class="text-xs text-slate-100 truncate">${escapeHtml(item.summary)}</span>
+                    </div>
+                `).join('');
+                return;
+            }
 
             if (boardId === 'couteria') {
                 listEl.innerHTML = boardData.couteria.map((corner, cIdx) => `
@@ -366,7 +401,7 @@
                 blCtx.fillText(entry.nick, 40, rowY + 38);
                 blCtx.fillStyle = '#292524';
                 blCtx.font = '500 19px "Noto Sans KR", sans-serif';
-                blCtx.fillText(entry.msg, 152, rowY + 38);
+                blCtx.fillText(entry.msg, 138, rowY + 38, 460);
             });
             if (customTextures.blindBoard) customTextures.blindBoard.needsUpdate = true;
         }
@@ -469,6 +504,113 @@
             });
 
             if (customTextures.couTeriaMenu) customTextures.couTeriaMenu.needsUpdate = true;
+        }
+
+        function redrawGlobalBoard() {
+            if (!globalCtx) return;
+            const mCtx = globalCtx;
+
+            mCtx.fillStyle = '#0f2342';
+            mCtx.fillRect(0, 0, 768, 420);
+            mCtx.strokeStyle = '#38bdf8';
+            mCtx.lineWidth = 8;
+            mCtx.strokeRect(10, 10, 748, 400);
+
+            // 배경 음영(워터마크) coupang 로고
+            mCtx.save();
+            mCtx.globalAlpha = 0.14;
+            mCtx.font = 'bold 124px Arial, sans-serif';
+            mCtx.textAlign = 'left';
+            mCtx.textBaseline = 'middle';
+            const boardLogoParts = [
+                { text: 'coup', color: '#ffffff' },
+                { text: 'a', color: '#ef4444' },
+                { text: 'n', color: '#facc15' },
+                { text: 'g', color: '#4ade80' }
+            ];
+            let totalLogoWidth = 0;
+            boardLogoParts.forEach(p => {
+                totalLogoWidth += mCtx.measureText(p.text).width;
+            });
+            let bLogoX = (768 - totalLogoWidth) / 2;
+            boardLogoParts.forEach(p => {
+                mCtx.fillStyle = p.color;
+                mCtx.fillText(p.text, bLogoX, 240);
+                bLogoX += mCtx.measureText(p.text).width;
+            });
+            mCtx.restore();
+
+            // 상단 타이틀 바
+            mCtx.fillStyle = 'rgba(14, 116, 144, 0.72)';
+            mCtx.beginPath();
+            mCtx.roundRect(28, 24, 712, 54, 12);
+            mCtx.fill();
+
+            mCtx.fillStyle = '#ffffff';
+            mCtx.font = 'bold 28px "Noto Sans KR", sans-serif';
+            mCtx.textAlign = 'center';
+            mCtx.textBaseline = 'middle';
+            mCtx.fillText('글로벌 현황', 384, 51);
+
+            // 한국 · 대만 · 일본 한 줄 행 표 구성
+            const tableX = 28;
+            const tableY = 98;
+            const tableW = 712;
+            const tableH = 290;
+            const rowH = tableH / 3;
+            const countryColW = 148;
+
+            mCtx.fillStyle = 'rgba(15, 35, 66, 0.58)';
+            mCtx.beginPath();
+            mCtx.roundRect(tableX, tableY, tableW, tableH, 14);
+            mCtx.fill();
+
+            boardData.globalStatus.forEach((c, idx) => {
+                const ry = tableY + idx * rowH;
+
+                // 국가명 셀 배경
+                mCtx.fillStyle = c.headerBg;
+                mCtx.fillRect(tableX + 2, ry + 2, countryColW - 2, rowH - 4);
+
+                // 국가명 텍스트
+                mCtx.fillStyle = '#ffffff';
+                mCtx.font = 'bold 27px "Noto Sans KR", sans-serif';
+                mCtx.textAlign = 'center';
+                mCtx.textBaseline = 'middle';
+                mCtx.fillText(c.country, tableX + countryColW / 2, ry + rowH / 2);
+
+                // 한 줄 현황 내용 텍스트
+                mCtx.fillStyle = '#f8fafc';
+                mCtx.font = '600 22px "Noto Sans KR", sans-serif';
+                mCtx.textAlign = 'left';
+                mCtx.fillText(c.summary, tableX + countryColW + 24, ry + rowH / 2, tableW - countryColW - 44);
+
+                // 행 가로 구분선
+                if (idx > 0) {
+                    mCtx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+                    mCtx.lineWidth = 2.5;
+                    mCtx.beginPath();
+                    mCtx.moveTo(tableX + 6, ry);
+                    mCtx.lineTo(tableX + tableW - 6, ry);
+                    mCtx.stroke();
+                }
+            });
+
+            // 국가명 열과 내용 열 세로 구분선
+            mCtx.strokeStyle = 'rgba(56, 189, 248, 0.55)';
+            mCtx.lineWidth = 2.5;
+            mCtx.beginPath();
+            mCtx.moveTo(tableX + countryColW, tableY + 4);
+            mCtx.lineTo(tableX + countryColW, tableY + tableH - 4);
+            mCtx.stroke();
+
+            mCtx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+            mCtx.lineWidth = 3;
+            mCtx.beginPath();
+            mCtx.roundRect(tableX, tableY, tableW, tableH, 14);
+            mCtx.stroke();
+
+            if (customTextures.mapBoard) customTextures.mapBoard.needsUpdate = true;
         }
 
         // 초기화 실행
@@ -602,81 +744,18 @@
             bCtx.ellipse(128, 132, 36, 9, 0, Math.PI, 0);
             bCtx.fill();
 
-            bCtx.fillStyle = '#2d241e';
-            bCtx.beginPath();
-            bCtx.arc(117, 146, 3.2, 0, Math.PI * 2);
-            bCtx.arc(139, 146, 3.2, 0, Math.PI * 2);
-            bCtx.fill();
-
-            bCtx.strokeStyle = '#2d241e';
-            bCtx.lineWidth = 2.5;
-            bCtx.beginPath();
-            bCtx.arc(128, 153, 8, 0.15 * Math.PI, 0.85 * Math.PI);
-            bCtx.stroke();
-
-            bCtx.font = 'bold 34px Arial, sans-serif';
-            const logoParts = [
-                { text: 'coup', color: '#4a2c18' },
-                { text: 'a', color: '#e53935' },
-                { text: 'n', color: '#fbc02d' },
-                { text: 'g', color: '#43a047' },
-                { text: ' ', color: '#039be5' }
-            ];
-            let startX = 64;
-            bCtx.textAlign = 'left';
-            logoParts.forEach(part => {
-                bCtx.fillStyle = part.color;
-                bCtx.fillText(part.text, startX, 295);
-                startX += bCtx.measureText(part.text).width;
-            });
-
-            customTextures.idBadge = new THREE.CanvasTexture(badgeCanvas);
-            customTextures.idBadge.encoding = THREE.sRGBEncoding;
-
-            // (B) 사내 현황 보드 텍스처 (쿠팡 로고만 표시)
-            const boardCanvas = document.createElement('canvas');
-            boardCanvas.width = 512;
-            boardCanvas.height = 320;
-            const mCtx = boardCanvas.getContext('2d');
-            mCtx.fillStyle = '#15325b';
-            mCtx.fillRect(0, 0, 512, 320);
-            mCtx.strokeStyle = '#38bdf8';
-            mCtx.lineWidth = 6;
-            mCtx.strokeRect(10, 10, 492, 300);
-
-            mCtx.font = 'bold 84px Arial, sans-serif';
-            mCtx.textAlign = 'left';
-            mCtx.textBaseline = 'middle';
-            const boardLogoParts = [
-                { text: 'coup', color: '#ffffff' },
-                { text: 'a', color: '#ef4444' },
-                { text: 'n', color: '#facc15' },
-                { text: 'g', color: '#4ade80' }
-            ];
-            let totalLogoWidth = 0;
-            boardLogoParts.forEach(p => {
-                totalLogoWidth += mCtx.measureText(p.text).width;
-            });
-            let bLogoX = (512 - totalLogoWidth) / 2;
-            boardLogoParts.forEach(p => {
-                mCtx.fillStyle = p.color;
-                mCtx.fillText(p.text, bLogoX, 162);
-                bLogoX += mCtx.measureText(p.text).width;
-            });
-            customTextures.mapBoard = new THREE.CanvasTexture(boardCanvas);
-            customTextures.mapBoard.encoding = THREE.sRGBEncoding;
             // (C) 쿠카페 간판 텍스처
             const cafeCanvas = document.createElement('canvas');
             cafeCanvas.width = 512;
             cafeCanvas.height = 128;
             const cCtx = cafeCanvas.getContext('2d');
-            cCtx.fillStyle = '#292524';
+            cCtx.fillStyle = '#3b2f26';
             cCtx.fillRect(0, 0, 512, 128);
-            cCtx.fillStyle = '#fef3c7';
-            cCtx.font = 'bold 46px "Noto Sans KR", sans-serif';
+            cCtx.fillStyle = '#f5e6d3';
+            cCtx.font = 'bold 42px "Noto Sans KR", sans-serif';
             cCtx.textAlign = 'center';
             cCtx.textBaseline = 'middle';
-            cCtx.fillText('쿠카페', 256, 66);
+            cCtx.fillText('☕ 쿠카페', 256, 66);
             customTextures.cafeSign = new THREE.CanvasTexture(cafeCanvas);
             customTextures.cafeSign.encoding = THREE.sRGBEncoding;
 
@@ -812,140 +891,168 @@
             fCtx.strokeRect(256, 0, 256, 256);
             fCtx.strokeRect(0, 256, 256, 256);
             fCtx.strokeRect(256, 256, 256, 256);
-            for (let i = 0; i < 1200; i++) {
-                fCtx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.08)' : 'rgba(90,82,72,0.06)';
-                fCtx.fillRect(Math.random() * 512, Math.random() * 512, 3, 3);
-            }
+
             const floorTex = new THREE.CanvasTexture(floorCanvas);
             floorTex.wrapS = THREE.RepeatWrapping;
             floorTex.wrapT = THREE.RepeatWrapping;
-            floorTex.repeat.set(14, 14);
+            floorTex.repeat.set(12, 12);
             floorTex.encoding = THREE.sRGBEncoding;
-            customTextures.lobbyFloor = floorTex;
+            customTextures.floorTile = floorTex;
+
+            // (I) 우드 천장 슬랫 텍스처
+            const woodCanvas = document.createElement('canvas');
+            woodCanvas.width = 256;
+            woodCanvas.height = 256;
+            const wCtx = woodCanvas.getContext('2d');
+            wCtx.fillStyle = '#b9895b';
+            wCtx.fillRect(0, 0, 256, 256);
+            wCtx.fillStyle = '#8b5e34';
+            for (let x = 0; x < 256; x += 24) {
+                wCtx.fillRect(x, 0, 6, 256);
+            }
+            const woodTex = new THREE.CanvasTexture(woodCanvas);
+            woodTex.wrapS = THREE.RepeatWrapping;
+            woodTex.wrapT = THREE.RepeatWrapping;
+            woodTex.repeat.set(10, 10);
+            woodTex.encoding = THREE.sRGBEncoding;
+            customTextures.woodSlat = woodTex;
+
+            // (J) 글로벌 현황 보드 캔버스 & 텍스처
+            const mapCanvas = document.createElement('canvas');
+            mapCanvas.width = 768;
+            mapCanvas.height = 420;
+            globalCanvas = mapCanvas;
+            globalCtx = mapCanvas.getContext('2d');
+            customTextures.mapBoard = new THREE.CanvasTexture(mapCanvas);
+            customTextures.mapBoard.encoding = THREE.sRGBEncoding;
+            redrawGlobalBoard();
+
+            customTextures.idBadge = new THREE.CanvasTexture(badgeCanvas);
+            customTextures.idBadge.encoding = THREE.sRGBEncoding;
         }
 
         /**
-         * 3. 사내 로비 건축 구조
+         * 3. 1층 로비 건축 구조물(바닥, 벽면, 통유리창, 우드 천장) 생성
          */
         function buildLobbyEnvironment() {
             const lobbyGroup = new THREE.Group();
 
-            const floorGeo = new THREE.PlaneGeometry(28, 28);
-            const floorMat = new THREE.MeshStandardMaterial({
-                map: customTextures.lobbyFloor,
-                roughness: 0.65,
-                metalness: 0.05
-            });
-            const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+            // 1층 메인 바닥
+            const floorMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(27, 27),
+                new THREE.MeshStandardMaterial({ map: customTextures.floorTile, roughness: 0.78 })
+            );
             floorMesh.rotation.x = -Math.PI / 2;
             floorMesh.receiveShadow = true;
             lobbyGroup.add(floorMesh);
 
-            const rugGeo = new THREE.PlaneGeometry(6.5, 16);
-            const rugMat = new THREE.MeshStandardMaterial({ color: 0xe3dcd0, roughness: 0.85 });
-            const rugMesh = new THREE.Mesh(rugGeo, rugMat);
-            rugMesh.rotation.x = -Math.PI / 2;
-            rugMesh.position.set(-0.5, 0.01, 1.5);
-            rugMesh.receiveShadow = true;
-            lobbyGroup.add(rugMesh);
+            // 중앙 라운지 원형 러그
+            const centerRug = new THREE.Mesh(
+                new THREE.CylinderGeometry(3.4, 3.4, 0.02, 48),
+                new THREE.MeshStandardMaterial({ color: 0xdfd8cc, roughness: 0.9 })
+            );
+            centerRug.position.set(0, 0.01, 2.2);
+            centerRug.receiveShadow = true;
+            lobbyGroup.add(centerRug);
 
-            const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xb88b5a, roughness: 0.6 });
-            const ceilingBase = new THREE.Mesh(new THREE.BoxGeometry(28, 0.4, 28), ceilingMat);
-            ceilingBase.position.set(0, 9.4, 0);
-            lobbyGroup.add(ceilingBase);
+            // 우드 슬랫 천장
+            const ceilingMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(27, 27),
+                new THREE.MeshStandardMaterial({ map: customTextures.woodSlat, roughness: 0.65 })
+            );
+            ceilingMesh.rotation.x = Math.PI / 2;
+            ceilingMesh.position.y = 8.2;
+            lobbyGroup.add(ceilingMesh);
 
-            for (let x = -12; x <= 12; x += 2.0) {
-                const beam = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.45, 27), ceilingMat);
-                beam.position.set(x, 9.0, 0);
-                lobbyGroup.add(beam);
-            }
+            // 외벽 재질
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.85 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0xd6cfc3, roughness: 0.7 });
 
-            const frameMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.4, metalness: 0.5 });
+            // 북쪽 벽면 (z = -13.5)
+            const northWall = new THREE.Mesh(new THREE.BoxGeometry(27, 8.2, 0.4), wallMat);
+            northWall.position.set(0, 4.1, -13.5);
+            northWall.receiveShadow = true;
+            lobbyGroup.add(northWall);
+
+            // 남쪽 벽면 (z = +13.5)
+            const southWall = new THREE.Mesh(new THREE.BoxGeometry(27, 8.2, 0.4), wallMat);
+            southWall.position.set(0, 4.1, 13.5);
+            southWall.receiveShadow = true;
+            lobbyGroup.add(southWall);
+
+            // 우측(동쪽) 벽면 (x = +13.5)
+            const eastWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 8.2, 27), wallMat);
+            eastWall.position.set(13.5, 4.1, 0);
+            eastWall.receiveShadow = true;
+            lobbyGroup.add(eastWall);
+
+            // 좌측(서쪽) 채광 통유리창 프레임 & 유리 (x = -13.5)
             const glassMat = new THREE.MeshPhysicalMaterial({
                 color: 0xe0f2fe,
                 transparent: true,
                 opacity: 0.28,
                 roughness: 0.1
             });
+            const westGlass = new THREE.Mesh(new THREE.PlaneGeometry(26.6, 7.6), glassMat);
+            westGlass.rotation.y = Math.PI / 2;
+            westGlass.position.set(-13.35, 4.0, 0);
+            lobbyGroup.add(westGlass);
 
-            const glassPane = new THREE.Mesh(new THREE.PlaneGeometry(26, 9), glassMat);
-            glassPane.rotation.y = Math.PI / 2;
-            glassPane.position.set(-13.4, 4.5, 0);
-            lobbyGroup.add(glassPane);
-
-            for (let z = -12; z <= 12; z += 3) {
-                const vMullion = new THREE.Mesh(new THREE.BoxGeometry(0.22, 9.2, 0.18), frameMat);
-                vMullion.position.set(-13.4, 4.6, z);
-                vMullion.castShadow = true;
-                lobbyGroup.add(vMullion);
-            }
-            for (let y = 2.2; y <= 8.8; y += 2.2) {
-                const hMullion = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.15, 26), frameMat);
-                hMullion.position.set(-13.4, y, 0);
-                lobbyGroup.add(hMullion);
+            for (let z = -12; z <= 12; z += 4) {
+                const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.24, 8.2, 0.22), trimMat);
+                mullion.position.set(-13.4, 4.1, z);
+                lobbyGroup.add(mullion);
             }
 
-            const outsideBackdrop = new THREE.Mesh(
-                new THREE.PlaneGeometry(36, 18),
-                new THREE.MeshBasicMaterial({ color: 0xfff8eb })
-            );
-            outsideBackdrop.rotation.y = Math.PI / 2;
-            outsideBackdrop.position.set(-18, 7, 0);
-            lobbyGroup.add(outsideBackdrop);
-
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0xe5dfd5, roughness: 0.8 });
-            const backWall = new THREE.Mesh(new THREE.BoxGeometry(28, 9.4, 0.5), wallMat);
-            backWall.position.set(0, 4.7, -13.5);
-            backWall.receiveShadow = true;
-            lobbyGroup.add(backWall);
-
-            const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 9.4, 28), wallMat);
-            rightWall.position.set(13.5, 4.7, 0);
-            rightWall.receiveShadow = true;
-            lobbyGroup.add(rightWall);
-
-            // 남쪽 벽면 (캐릭터 초기 정면 방향 Z = 13.75)
-            const frontWall = new THREE.Mesh(new THREE.BoxGeometry(28, 9.4, 0.5), wallMat);
-            frontWall.position.set(0, 4.7, 13.75);
-            frontWall.receiveShadow = true;
-            lobbyGroup.add(frontWall);
-
-            const concreteMat = new THREE.MeshStandardMaterial({ color: 0xa8a29e, roughness: 0.75 });
-            const pillarPositions = [[-11.5, -6], [-11.5, 5], [11.5, -6], [11.5, 5]];
-            pillarPositions.forEach(([px, pz]) => {
-                const pillar = new THREE.Mesh(new THREE.BoxGeometry(1.1, 9.2, 1.1), concreteMat);
-                pillar.position.set(px, 4.6, pz);
-                pillar.castShadow = true;
-                pillar.receiveShadow = true;
-                lobbyGroup.add(pillar);
-                addCollider(px - 0.65, px + 0.65, pz - 0.65, pz + 0.65, 0, 9);
-            });
+            // 외곽 벽 충돌 경계 등록
+            addCollider(-14.2, 14.2, -14.2, -13.1, 0, 8.2);
+            addCollider(-14.2, 14.2, 13.1, 14.2, 0, 8.2);
+            addCollider(13.1, 14.2, -14.2, 14.2, 0, 8.2);
+            addCollider(-14.2, -13.1, -14.2, 14.2, 0, 8.2);
 
             scene.add(lobbyGroup);
         }
 
         /**
-         * 4. 로비 주요 구역 가구 및 오브젝트 배치
+         * 4. 로비 가구, 커피차, 보드, 굿즈샵, 게시판 배치
          */
         function buildFurnitureAndProps() {
             const propsGroup = new THREE.Group();
-            const oakMat = new THREE.MeshStandardMaterial({ color: 0xc89d6c, roughness: 0.55 });
-            const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x292524, roughness: 0.4, metalness: 0.5 });
+            const oakMat = new THREE.MeshStandardMaterial({ color: 0xc29363, roughness: 0.58 });
+            const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.45, metalness: 0.35 });
 
-            // --- (1) 좌측 카페 코너 ---
-            const counter = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.05, 5.4), oakMat);
-            counter.position.set(-11.2, 0.525, -1.2);
-            counter.castShadow = true;
-            counter.receiveShadow = true;
-            propsGroup.add(counter);
-            addCollider(-12.4, -10.0, -4.0, 1.6, 0, 2);
+            // --- (1) 좌측 쿠카페 바 카운터 & 에스프레소 존 ---
+            const cafeCounter = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.05, 5.2), oakMat);
+            cafeCounter.position.set(-11.4, 0.525, -1.2);
+            cafeCounter.castShadow = true;
+            cafeCounter.receiveShadow = true;
+            propsGroup.add(cafeCounter);
+            addCollider(-12.3, -10.5, -4.0, 1.6, 0, 2);
+
+            const cafeBackCounter = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.0, 5.2), oakMat);
+            cafeBackCounter.position.set(-12.7, 0.5, -1.2);
+            propsGroup.add(cafeBackCounter);
+
+            const espressoMachine = new THREE.Mesh(
+                new THREE.BoxGeometry(0.55, 0.55, 0.75),
+                new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.7, roughness: 0.25 })
+            );
+            espressoMachine.position.set(-12.65, 1.28, -1.8);
+            espressoMachine.castShadow = true;
+            propsGroup.add(espressoMachine);
 
             const signBoard = new THREE.Mesh(
-                new THREE.BoxGeometry(0.15, 0.75, 3.2),
+                new THREE.BoxGeometry(0.12, 0.75, 3.0),
                 new THREE.MeshStandardMaterial({ map: customTextures.cafeSign })
             );
-            signBoard.position.set(-10.1, 3.25, -1.2);
+            signBoard.position.set(-11.4, 3.1, -1.2);
             propsGroup.add(signBoard);
+
+            [-2.2, -0.2].forEach(zPos => {
+                const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 1.8), darkMetalMat);
+                wire.position.set(-11.4, 4.3, zPos);
+                propsGroup.add(wire);
+            });
 
             const tableX = -7.8, tableZ = 1.6;
             const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.1, 3.6), oakMat);
@@ -1021,12 +1128,12 @@
                 addCollider(p.x - p.r * 0.85, p.x + p.r * 0.85, p.z - p.r * 0.85, p.z + p.r * 0.85, 0, 1.2);
             });
 
-            // --- (4) 우측 벽면 대형 디지털 네트워크 보드 ---
+            // --- (4) 우측 벽면 대형 글로벌 현황 보드 ---
             const bigBoard = new THREE.Mesh(
-                new THREE.BoxGeometry(0.18, 2.5, 4.4),
+                new THREE.BoxGeometry(0.22, 3.6, 6.8),
                 new THREE.MeshStandardMaterial({ map: customTextures.mapBoard })
             );
-            bigBoard.position.set(13.15, 2.35, 1.2);
+            bigBoard.position.set(13.15, 2.75, 0);
             propsGroup.add(bigBoard);
 
             // --- (4-B) 쿠팡그룹 블라인드 대형 게시판 (로비 북쪽 구역) ---
@@ -1583,9 +1690,9 @@
                     badge: 'COUCAFE',
                     floor: '1F 좌측 창가',
                     title: '쿠카페 (CouCafe)',
-                    text: '통유리창으로 들어오는 자연광 아래 커피를 마시며 자유롭게 협업하는 쿠카페 라운지 테이블입니다.',
-                    pos: new THREE.Vector3(-8.2, 0, 1.0),
-                    radius: 3.6
+                    text: '통유리창으로 들어오는 자연광을 받으며 커피와 노트북 작업을 즐길 수 있는 사내 카페 코너입니다.',
+                    pos: new THREE.Vector3(-8.5, 0, 1.0),
+                    radius: 3.4
                 },
                 {
                     id: 'kiosk',
@@ -1608,11 +1715,11 @@
                 {
                     id: 'board',
                     badge: 'NETWORK BOARD',
-                    floor: '1F 우측 벽면',
-                    title: '사내 로비 & 물류 현황 보드',
+                    floor: '1F 우측 벽면 중앙',
+                    title: '글로벌 현황',
                     text: '실시간 네트워크 연결과 주요 거점을 시각적으로 보여주는 대형 디스플레이입니다.',
-                    pos: new THREE.Vector3(11.6, 0, 1.2),
-                    radius: 3.0
+                    pos: new THREE.Vector3(11.4, 0, 0),
+                    radius: 3.8
                 },
                 {
                     id: 'blind',
@@ -1702,9 +1809,16 @@
             const boardForm = document.getElementById('board-post-form');
             const boardListEl = document.getElementById('board-post-list');
             const cornerSelect = document.getElementById('board-corner-select');
+            const countrySelect = document.getElementById('board-country-select');
             const nickInput = document.getElementById('board-nick-input');
             const msgInput = document.getElementById('board-msg-input');
             const feedbackEl = document.getElementById('board-post-feedback');
+
+            countrySelect.addEventListener('change', () => {
+                if (activeLandmarkId !== 'board') return;
+                const found = boardData.globalStatus.find(g => g.country === countrySelect.value);
+                if (found) msgInput.value = found.summary;
+            });
 
             // 쿠테리아 메뉴 항목 개별 삭제 버튼 처리
             boardListEl.addEventListener('click', (e) => {
@@ -1728,6 +1842,28 @@
 
             boardForm.addEventListener('submit', (e) => {
                 e.preventDefault();
+                if (activeLandmarkId === 'board') {
+                    const selectedCountry = countrySelect.value;
+                    const summaryText = msgInput.value.trim();
+                    if (!summaryText) {
+                        feedbackEl.textContent = '표시할 한 줄 현황을 입력해 주세요.';
+                        feedbackEl.className = 'text-[11px] font-medium text-rose-600';
+                        return;
+                    }
+                    const targetItem = boardData.globalStatus.find(g => g.country === selectedCountry);
+                    if (targetItem) {
+                        targetItem.summary = summaryText;
+                        redrawGlobalBoard();
+                        renderBoardPostList('board');
+                    }
+                    feedbackEl.textContent = `${selectedCountry} 현황이 한 줄로 수정되었습니다!`;
+                    feedbackEl.className = 'text-[11px] font-medium text-emerald-700';
+                    setTimeout(() => {
+                        feedbackEl.textContent = '';
+                    }, 2200);
+                    return;
+                }
+
                 if (activeLandmarkId === 'couteria') {
                     const selectedCorner = cornerSelect.value;
                     const menuName = msgInput.value.trim();
@@ -2085,6 +2221,7 @@
             const boardList = document.getElementById('board-post-list');
             const boardForm = document.getElementById('board-post-form');
             const cornerSelect = document.getElementById('board-corner-select');
+            const countrySelect = document.getElementById('board-country-select');
             const nickInput = document.getElementById('board-nick-input');
             const msgInput = document.getElementById('board-msg-input');
             const submitBtn = document.getElementById('board-submit-btn');
@@ -2096,19 +2233,34 @@
                 document.getElementById('landmark-title').textContent = nearestLandmark.title;
                 document.getElementById('landmark-text').textContent = nearestLandmark.text;
 
-                if (nearestLandmark.id === 'blind' || nearestLandmark.id === 'dangpang' || nearestLandmark.id === 'couteria') {
+                if (nearestLandmark.id === 'blind' || nearestLandmark.id === 'dangpang' || nearestLandmark.id === 'couteria' || nearestLandmark.id === 'board') {
                     if (activeLandmarkId !== nearestLandmark.id) {
                         document.getElementById('board-post-feedback').textContent = '';
                         renderBoardPostList(nearestLandmark.id);
+                        if (nearestLandmark.id === 'board') {
+                            const initCountry = boardData.globalStatus.find(g => g.country === countrySelect.value);
+                            msgInput.value = initCountry ? initCountry.summary : '';
+                        } else {
+                            msgInput.value = '';
+                        }
                     }
-                    if (nearestLandmark.id === 'couteria') {
+                    if (nearestLandmark.id === 'board') {
+                        cornerSelect.classList.add('hidden');
+                        countrySelect.classList.remove('hidden');
+                        nickInput.classList.add('hidden');
+                        msgInput.placeholder = '국가별 한 줄 현황 내용을 입력하세요';
+                        submitBtn.textContent = '현황 수정';
+                        submitBtn.className = 'px-3 py-1 bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold rounded-lg transition-all cursor-pointer';
+                    } else if (nearestLandmark.id === 'couteria') {
                         cornerSelect.classList.remove('hidden');
+                        countrySelect.classList.add('hidden');
                         nickInput.classList.add('hidden');
                         msgInput.placeholder = '추가할 오늘의 메뉴를 입력하세요';
                         submitBtn.textContent = '메뉴 추가';
                         submitBtn.className = 'px-3 py-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-lg transition-all cursor-pointer';
                     } else {
                         cornerSelect.classList.add('hidden');
+                        countrySelect.classList.add('hidden');
                         nickInput.classList.remove('hidden');
                         msgInput.placeholder = '게시판에 남길 메시지를 입력하세요';
                         submitBtn.textContent = '게시글 등록';
