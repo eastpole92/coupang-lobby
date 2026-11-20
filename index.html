@@ -224,6 +224,8 @@
         let db = null;
         let auth = null;
         let currentUser = null;
+        let useBrowserStorageFallback = false;
+        const LOCAL_STORAGE_KEY = 'cou_lobby_boards_v1';
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-lobby-app';
 
         // 전역 변수 설정
@@ -615,15 +617,84 @@
             if (customTextures.mapBoard) customTextures.mapBoard.needsUpdate = true;
         }
 
-        // 클라우드 저장 및 실시간 동기화 초기화
+        function applyLoadedBoardData(data) {
+            if (!data || typeof data !== 'object') return;
+            if (Array.isArray(data.blind)) {
+                boardData.blind = data.blind;
+                redrawBlindBoard();
+            }
+            if (Array.isArray(data.dangpang)) {
+                boardData.dangpang = data.dangpang;
+                redrawDangpangBoard();
+            }
+            if (Array.isArray(data.couteria)) {
+                data.couteria.forEach((savedCorner, idx) => {
+                    if (boardData.couteria[idx] && Array.isArray(savedCorner.items)) {
+                        boardData.couteria[idx].items = savedCorner.items;
+                    }
+                });
+                redrawCouTeriaMenu();
+            }
+            if (Array.isArray(data.globalStatus)) {
+                data.globalStatus.forEach((savedCountry, idx) => {
+                    if (boardData.globalStatus[idx] && typeof savedCountry.summary === 'string') {
+                        boardData.globalStatus[idx].summary = savedCountry.summary;
+                    }
+                });
+                redrawGlobalBoard();
+            }
+            if (activeLandmarkId === 'blind' || activeLandmarkId === 'dangpang' || activeLandmarkId === 'couteria' || activeLandmarkId === 'board') {
+                renderBoardPostList(activeLandmarkId);
+            }
+        }
+
+        function loadBoardDataFromBrowser() {
+            try {
+                const raw = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                applyLoadedBoardData(parsed);
+                return true;
+            } catch (err) {
+                console.warn('브라우저 저장소 불러오기 오류:', err);
+                return false;
+            }
+        }
+
+        function saveBoardDataToBrowser() {
+            try {
+                const payload = {
+                    blind: boardData.blind,
+                    dangpang: boardData.dangpang,
+                    couteria: boardData.couteria.map(c => ({ title: c.title, items: c.items })),
+                    globalStatus: boardData.globalStatus.map(g => ({ country: g.country, summary: g.summary })),
+                    updatedAt: Date.now()
+                };
+                window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
+            } catch (err) {
+                console.warn('브라우저 저장소 저장 오류:', err);
+            }
+        }
+
+        // 클라우드 저장 및 실시간 동기화 초기화 (외부 호스팅 시 브라우저 저장소 자동 폴백)
         async function initCloudStorage() {
             const syncBadge = document.getElementById('cloud-sync-badge');
             try {
-                if (typeof __firebase_config === 'undefined') {
-                    if (syncBadge) syncBadge.textContent = '⚠️ 오프라인 모드';
+                // 미리보기 환경(__firebase_config) 또는 외부 호스팅용 window.FIREBASE_CONFIG 지원
+                const rawConfig = typeof __firebase_config !== 'undefined'
+                    ? __firebase_config
+                    : (typeof window.FIREBASE_CONFIG !== 'undefined' ? window.FIREBASE_CONFIG : null);
+
+                if (!rawConfig) {
+                    useBrowserStorageFallback = true;
+                    loadBoardDataFromBrowser();
+                    if (syncBadge) {
+                        syncBadge.textContent = '💾 브라우저 저장 연동됨';
+                        syncBadge.title = 'GitHub Pages 등 단독 접속 환경에서는 현재 브라우저에 자동 저장됩니다.';
+                    }
                     return;
                 }
-                const firebaseConfig = JSON.parse(__firebase_config);
+                const firebaseConfig = typeof rawConfig === 'string' ? JSON.parse(rawConfig) : rawConfig;
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -636,7 +707,12 @@
                     currentUser = cred.user;
                 }
 
-                if (!currentUser) return;
+                if (!currentUser) {
+                    useBrowserStorageFallback = true;
+                    loadBoardDataFromBrowser();
+                    if (syncBadge) syncBadge.textContent = '💾 브라우저 저장 연동됨';
+                    return;
+                }
 
                 const sharedDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'lobby_boards', 'shared_state');
                 onSnapshot(sharedDocRef, (snapshot) => {
@@ -645,47 +721,28 @@
                         return;
                     }
                     const data = snapshot.data();
-                    if (Array.isArray(data.blind)) {
-                        boardData.blind = data.blind;
-                        redrawBlindBoard();
-                    }
-                    if (Array.isArray(data.dangpang)) {
-                        boardData.dangpang = data.dangpang;
-                        redrawDangpangBoard();
-                    }
-                    if (Array.isArray(data.couteria)) {
-                        data.couteria.forEach((savedCorner, idx) => {
-                            if (boardData.couteria[idx] && Array.isArray(savedCorner.items)) {
-                                boardData.couteria[idx].items = savedCorner.items;
-                            }
-                        });
-                        redrawCouTeriaMenu();
-                    }
-                    if (Array.isArray(data.globalStatus)) {
-                        data.globalStatus.forEach((savedCountry, idx) => {
-                            if (boardData.globalStatus[idx] && typeof savedCountry.summary === 'string') {
-                                boardData.globalStatus[idx].summary = savedCountry.summary;
-                            }
-                        });
-                        redrawGlobalBoard();
-                    }
-
-                    if (activeLandmarkId === 'blind' || activeLandmarkId === 'dangpang' || activeLandmarkId === 'couteria' || activeLandmarkId === 'board') {
-                        renderBoardPostList(activeLandmarkId);
-                    }
-                    if (syncBadge) syncBadge.textContent = '☁️ 저장 연동됨';
+                    applyLoadedBoardData(data);
+                    saveBoardDataToBrowser();
+                    if (syncBadge) syncBadge.textContent = '☁️ 클라우드 저장 연동됨';
                 }, (error) => {
                     console.error('게시판 데이터 동기화 오류:', error);
-                    if (syncBadge) syncBadge.textContent = '⚠️ 동기화 지연';
+                    useBrowserStorageFallback = true;
+                    loadBoardDataFromBrowser();
+                    if (syncBadge) syncBadge.textContent = '💾 브라우저 저장 연동됨';
                 });
             } catch (err) {
                 console.error('클라우드 초기화 오류:', err);
-                if (syncBadge) syncBadge.textContent = '⚠️ 연결 실패';
+                useBrowserStorageFallback = true;
+                loadBoardDataFromBrowser();
+                if (syncBadge) syncBadge.textContent = '💾 브라우저 저장 연동됨';
             }
         }
 
         async function saveBoardDataToCloud() {
-            if (!db || !currentUser) return;
+            // 항상 로컬 백업 저장
+            saveBoardDataToBrowser();
+
+            if (useBrowserStorageFallback || !db || !currentUser) return;
             try {
                 const sharedDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'lobby_boards', 'shared_state');
                 await setDoc(sharedDocRef, {
