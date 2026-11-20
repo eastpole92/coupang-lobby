@@ -279,4 +279,457 @@
     // 우측 상단 로켓 오브제 + COUPANG 로고
     const rocketGroup = new THREE.Group();
     rocketGroup.position.set(11.5, 6.2, -14.5);
-    rocketGroup.rotation.z = -0.5
+    rocketGroup.rotation.z = -0.55;
+    rocketGroup.rotation.y = -0.4;
+
+    const rocketBody = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.15, 1.35, 4.4, 24),
+      new THREE.MeshStandardMaterial({ color: 0x7dd3fc, roughness: 0.4 })
+    );
+    rocketGroup.add(rocketBody);
+
+    const rocketNose = new THREE.Mesh(
+      new THREE.ConeGeometry(1.15, 2.2, 24),
+      new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4 })
+    );
+    rocketNose.position.y = 3.3;
+    rocketGroup.add(rocketNose);
+
+    const rocketFlame = new THREE.Mesh(
+      new THREE.ConeGeometry(0.85, 2.0, 18),
+      new THREE.MeshBasicMaterial({ color: 0xf97316 })
+    );
+    rocketFlame.position.y = -3.1;
+    rocketFlame.rotation.x = Math.PI;
+    rocketGroup.add(rocketFlame);
+    scene.add(rocketGroup);
+
+    // 5. 라운드 암체어 & 검정 원형 테이블 & 관엽식물
+    const chairPalette = [0xf5f5f4, 0xfbbf24, 0xfb923c, 0xd6d3d1];
+    function createLoungeSet(x, z, mainColor) {
+      const group = new THREE.Group();
+      group.position.set(x, 0, z);
+
+      const tableTop = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.9, 0.9, 0.08, 24),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 })
+      );
+      tableTop.position.y = 0.72;
+      tableTop.castShadow = true;
+      group.add(tableTop);
+
+      const tablePedestal = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.14, 0.42, 0.72, 18),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 })
+      );
+      tablePedestal.position.y = 0.36;
+      group.add(tablePedestal);
+
+      const chairMat = new THREE.MeshStandardMaterial({ color: mainColor, roughness: 0.8 });
+      for (let i = 0; i < 3; i++) {
+        const angle = (i / 3) * Math.PI * 2 + 0.4;
+        const chair = new THREE.Group();
+        chair.position.set(Math.cos(angle) * 1.45, 0, Math.sin(angle) * 1.45);
+        chair.rotation.y = -angle + Math.PI;
+
+        const seat = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.5, 0.38, 20), chairMat);
+        seat.position.y = 0.19;
+        seat.castShadow = true;
+        chair.add(seat);
+
+        const back = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.5, 0.5, 0.52, 20, 1, true, -Math.PI * 0.42, Math.PI * 0.84),
+          chairMat
+        );
+        back.position.set(0, 0.52, -0.02);
+        back.castShadow = true;
+        chair.add(back);
+
+        group.add(chair);
+      }
+      return group;
+    }
+
+    scene.add(createLoungeSet(-6, 3, chairPalette[0]));
+    scene.add(createLoungeSet(4, -2, chairPalette[1]));
+    scene.add(createLoungeSet(8.5, 5.5, chairPalette[2]));
+    scene.add(createLoungeSet(-11, -5, chairPalette[3]));
+
+    // 화분 배치
+    const plantCoords = [[-16.5, -15], [-16.5, 4], [1.5, -15.5], [15.5, 1]];
+    plantCoords.forEach(([px, pz]) => {
+      const pot = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.55, 0.45, 0.75, 16),
+        new THREE.MeshStandardMaterial({ color: 0xd6d3d1, roughness: 0.7 })
+      );
+      pot.position.set(px, 0.375, pz);
+      pot.castShadow = true;
+      scene.add(pot);
+
+      const foliage = new THREE.Mesh(
+        new THREE.ConeGeometry(0.95, 2.2, 12),
+        new THREE.MeshStandardMaterial({ color: 0x2f855a, roughness: 0.8 })
+      );
+      foliage.position.set(px, 1.7, pz);
+      foliage.castShadow = true;
+      scene.add(foliage);
+    });
+
+    // 6. 소연 구역 (접근 시 '소연 - 퇴사할게요' 음성 및 말풍선 재생)
+    const soyeonZoneCenter = new THREE.Vector3(2.5, 0, 2.0);
+    const soyeonTriggerRadius = 5.5;
+
+    const soyeonMarker = new THREE.Mesh(
+      new THREE.RingGeometry(soyeonTriggerRadius - 0.14, soyeonTriggerRadius, 48),
+      new THREE.MeshBasicMaterial({
+        color: 0xf472b6,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.45
+      })
+    );
+    soyeonMarker.rotation.x = -Math.PI / 2;
+    soyeonMarker.position.set(soyeonZoneCenter.x, 0.02, soyeonZoneCenter.z);
+    scene.add(soyeonMarker);
+
+    const soyeonNpc = new THREE.Group();
+    soyeonNpc.position.set(soyeonZoneCenter.x, 0, soyeonZoneCenter.z - 1.2);
+    const soyeonBody = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.36, 0.42, 1.15, 18),
+      new THREE.MeshStandardMaterial({ color: 0xfda4af, roughness: 0.7 })
+    );
+    soyeonBody.position.y = 0.85;
+    soyeonBody.castShadow = true;
+    soyeonNpc.add(soyeonBody);
+
+    const soyeonHead = new THREE.Mesh(
+      new THREE.SphereGeometry(0.45, 20, 20),
+      new THREE.MeshStandardMaterial({ color: 0xfde2d5, roughness: 0.6 })
+    );
+    soyeonHead.position.y = 1.82;
+    soyeonHead.castShadow = true;
+    soyeonNpc.add(soyeonHead);
+    scene.add(soyeonNpc);
+
+    // 7. 주인공 캐릭터 (하늘색 모자·상의, 남색 소매·바지, 쿠팡 로고 사원증)
+    const player = new THREE.Group();
+    player.position.set(-2, 0, 8);
+
+    const skinMat = new THREE.MeshStandardMaterial({ color: 0xf4b69c, roughness: 0.6 });
+    const skyBlueMat = new THREE.MeshStandardMaterial({ color: 0xa5c8e4, roughness: 0.75 });
+    const navyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.75 });
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
+
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.56, 24, 24), skinMat);
+    head.position.y = 2.05;
+    head.castShadow = true;
+    player.add(head);
+
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+    [-0.17, 0.17].forEach((ex) => {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), eyeMat);
+      eye.position.set(ex, 2.08, 0.52);
+      player.add(eye);
+    });
+
+    const capDome = new THREE.Mesh(
+      new THREE.SphereGeometry(0.58, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.52),
+      skyBlueMat
+    );
+    capDome.position.y = 2.08;
+    capDome.castShadow = true;
+    player.add(capDome);
+
+    const capBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.58, 0.06, 20), skyBlueMat);
+    capBrim.position.set(0, 2.18, 0.34);
+    capBrim.rotation.x = 0.14;
+    player.add(capBrim);
+
+    const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.52, 0.95, 20), skyBlueMat);
+    torso.position.y = 1.15;
+    torso.castShadow = true;
+    player.add(torso);
+
+    const lanyard = new THREE.Mesh(
+      new THREE.TorusGeometry(0.32, 0.025, 8, 24, Math.PI),
+      new THREE.MeshStandardMaterial({ color: 0x0284c7 })
+    );
+    lanyard.position.set(0, 1.54, 0.44);
+    lanyard.rotation.x = Math.PI * 0.88;
+    player.add(lanyard);
+
+    const badgeCanvas = document.createElement('canvas');
+    badgeCanvas.width = 128;
+    badgeCanvas.height = 180;
+    const bCtx = badgeCanvas.getContext('2d');
+    bCtx.fillStyle = '#ffffff';
+    bCtx.fillRect(0, 0, 128, 180);
+    bCtx.fillStyle = '#e2e8f0';
+    bCtx.fillRect(28, 26, 72, 72);
+    bCtx.fillStyle = '#f4b69c';
+    bCtx.beginPath();
+    bCtx.arc(64, 66, 22, 0, Math.PI * 2);
+    bCtx.fill();
+    bCtx.fillStyle = '#a5c8e4';
+    bCtx.beginPath();
+    bCtx.arc(64, 58, 22, Math.PI, 0);
+    bCtx.fill();
+    bCtx.font = 'bold 20px sans-serif';
+    bCtx.textAlign = 'center';
+    bCtx.fillStyle = '#475569';
+    bCtx.fillText('coup', 44, 142);
+    bCtx.fillStyle = '#ef4444';
+    bCtx.fillText('a', 73, 142);
+    bCtx.fillStyle = '#f59e0b';
+    bCtx.fillText('n', 85, 142);
+    bCtx.fillStyle = '#10b981';
+    bCtx.fillText('g', 97, 142);
+
+    const idBadge = new THREE.Mesh(
+      new THREE.BoxGeometry(0.24, 0.34, 0.03),
+      new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(badgeCanvas) })
+    );
+    idBadge.position.set(0, 1.12, 0.51);
+    player.add(idBadge);
+
+    function createArm(side) {
+      const armGroup = new THREE.Group();
+      armGroup.position.set(side * 0.56, 1.48, 0);
+
+      const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.13, 0.58, 14), skyBlueMat);
+      sleeve.position.y = -0.26;
+      sleeve.castShadow = true;
+      armGroup.add(sleeve);
+
+      const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.135, 0.13, 0.1, 14), navyMat);
+      cuff.position.y = -0.58;
+      armGroup.add(cuff);
+
+      const hand = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 14), skinMat);
+      hand.position.y = -0.7;
+      armGroup.add(hand);
+
+      return armGroup;
+    }
+    const leftArm = createArm(-1);
+    const rightArm = createArm(1);
+    player.add(leftArm, rightArm);
+
+    function createLeg(side) {
+      const legGroup = new THREE.Group();
+      legGroup.position.set(side * 0.22, 0.68, 0);
+
+      const pants = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.16, 0.52, 16), navyMat);
+      pants.position.y = -0.24;
+      pants.castShadow = true;
+      legGroup.add(pants);
+
+      const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.16, 0.38), whiteMat);
+      shoe.position.set(0, -0.58, 0.05);
+      shoe.castShadow = true;
+      legGroup.add(shoe);
+
+      return legGroup;
+    }
+    const leftLeg = createLeg(-1);
+    const rightLeg = createLeg(1);
+    player.add(leftLeg, rightLeg);
+
+    scene.add(player);
+
+    // 8. '소연 - 퇴사할게요' 음성 재생 컨트롤
+    const voiceBadge = document.getElementById('voice-badge');
+    const voiceStatus = document.getElementById('voice-status');
+    const soyeonBubble = document.getElementById('soyeon-bubble');
+
+    let voiceUnlocked = false;
+    let isVoiceEnabled = true;
+    let wasInsideSoyeonZone = false;
+    let lastSpokenAt = 0;
+
+    function unlockVoice() {
+      if (!voiceUnlocked) {
+        voiceUnlocked = true;
+        if (isVoiceEnabled) {
+          voiceStatus.textContent = '음성 안내: 대기 중 (소연 구역 접근 시 재생)';
+          voiceBadge.classList.add('active');
+        }
+      }
+    }
+
+    function speakSoyeonResignation() {
+      const now = Date.now();
+      if (!isVoiceEnabled || now - lastSpokenAt < 4500) return;
+      lastSpokenAt = now;
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance('소연, 퇴사할게요');
+        utter.lang = 'ko-KR';
+        utter.rate = 1.0;
+        utter.pitch = 1.05;
+        window.speechSynthesis.speak(utter);
+      }
+      voiceStatus.textContent = '재생 중: 소연 - 퇴사할게요';
+      setTimeout(() => {
+        if (isVoiceEnabled) {
+          voiceStatus.textContent = '음성 안내: 활성 (소연 - 퇴사할게요)';
+        }
+      }, 3000);
+    }
+
+    voiceBadge.addEventListener('click', () => {
+      unlockVoice();
+      isVoiceEnabled = !isVoiceEnabled;
+      if (!isVoiceEnabled) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        voiceBadge.classList.remove('active');
+        voiceStatus.textContent = '음성 안내: 꺼짐';
+      } else {
+        voiceBadge.classList.add('active');
+        voiceStatus.textContent = '음성 안내: 활성 (소연 - 퇴사할게요)';
+      }
+    });
+
+    // 9. 조작 & 발걸음 모드 & 카메라 회전
+    const keys = {};
+    window.addEventListener('keydown', (e) => {
+      keys[e.code] = true;
+      unlockVoice();
+    });
+    window.addEventListener('keyup', (e) => {
+      keys[e.code] = false;
+    });
+
+    const paces = [
+      { label: '나 느린 발걸음', speed: 4.2 },
+      { label: '여유로운 산책', speed: 6.2 },
+      { label: '경쾌한 발걸음', speed: 8.5 }
+    ];
+    let paceIdx = 0;
+    const paceBtn = document.getElementById('pace-btn');
+    const overheadLabel = document.getElementById('overhead-label');
+
+    paceBtn.addEventListener('click', () => {
+      unlockVoice();
+      paceIdx = (paceIdx + 1) % paces.length;
+      paceBtn.textContent = `발걸음: ${paces[paceIdx].label}`;
+      overheadLabel.textContent = paces[paceIdx].label;
+    });
+
+    let camYaw = 0;
+    let camPitch = 0.32;
+    let isDragging = false;
+    let prevMouse = { x: 0, y: 0 };
+
+    window.addEventListener('mousedown', (e) => {
+      unlockVoice();
+      isDragging = true;
+      prevMouse = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      camYaw -= (e.clientX - prevMouse.x) * 0.006;
+      camPitch = Math.max(0.12, Math.min(0.85, camPitch + (e.clientY - prevMouse.y) * 0.005));
+      prevMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    // 10. 구역 안내 & 애니메이션 루프
+    const zoneCard = document.getElementById('zone-card');
+    const zoneTitle = document.getElementById('zone-title');
+    const zoneDesc = document.getElementById('zone-desc');
+
+    const clock = new THREE.Clock();
+    let walkTime = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const elapsed = clock.getElapsedTime();
+
+      // 로켓 오브제 은은한 부유 모션
+      rocketGroup.position.y = 6.2 + Math.sin(elapsed * 1.6) * 0.22;
+
+      let moveX = 0;
+      let moveZ = 0;
+      if (keys['KeyW'] || keys['ArrowUp']) moveZ -= 1;
+      if (keys['KeyS'] || keys['ArrowDown']) moveZ += 1;
+      if (keys['KeyA'] || keys['ArrowLeft']) moveX -= 1;
+      if (keys['KeyD'] || keys['ArrowRight']) moveX += 1;
+
+      const isMoving = moveX !== 0 || moveZ !== 0;
+      if (isMoving) {
+        const inputAngle = Math.atan2(moveX, moveZ) + camYaw;
+        const speed = paces[paceIdx].speed;
+        player.position.x += Math.sin(inputAngle) * speed * dt;
+        player.position.z += Math.cos(inputAngle) * speed * dt;
+
+        player.position.x = Math.max(-18, Math.min(18, player.position.x));
+        player.position.z = Math.max(-18, Math.min(18, player.position.z));
+
+        player.rotation.y = inputAngle;
+        walkTime += dt * speed * 1.9;
+        leftLeg.rotation.x = Math.sin(walkTime) * 0.55;
+        rightLeg.rotation.x = -Math.sin(walkTime) * 0.55;
+        leftArm.rotation.x = -Math.sin(walkTime) * 0.45;
+        rightArm.rotation.x = Math.sin(walkTime) * 0.45;
+      } else {
+        leftLeg.rotation.x *= 0.85;
+        rightLeg.rotation.x *= 0.85;
+        leftArm.rotation.x *= 0.85;
+        rightArm.rotation.x *= 0.85;
+      }
+
+      // 소연 구역 접근 판정 및 '소연 - 퇴사할게요' 재생
+      const distToSoyeon = player.position.distanceTo(soyeonZoneCenter);
+      const insideSoyeon = distToSoyeon <= soyeonTriggerRadius;
+
+      if (insideSoyeon) {
+        soyeonBubble.classList.add('show');
+        if (!wasInsideSoyeonZone) {
+          speakSoyeonResignation();
+        }
+        zoneTitle.textContent = '소연 구역';
+        zoneDesc.textContent = '소연 - 퇴사할게요';
+        zoneCard.classList.add('visible');
+      } else {
+        soyeonBubble.classList.remove('show');
+        zoneCard.classList.remove('visible');
+      }
+      wasInsideSoyeonZone = insideSoyeon;
+
+      // 3인칭 추적 카메라
+      const camDist = 8.2;
+      camera.position.set(
+        player.position.x + Math.sin(camYaw) * Math.cos(camPitch) * camDist,
+        player.position.y + 1.9 + Math.sin(camPitch) * camDist,
+        player.position.z + Math.cos(camYaw) * Math.cos(camPitch) * camDist
+      );
+      camera.lookAt(player.position.x, player.position.y + 1.55, player.position.z);
+
+      // 캐릭터 머리 위 말풍선 좌표
+      const headWorldPos = new THREE.Vector3(player.position.x, player.position.y + 3.05, player.position.z);
+      headWorldPos.project(camera);
+      overheadLabel.style.left = `${(headWorldPos.x * 0.5 + 0.5) * window.innerWidth}px`;
+      overheadLabel.style.top = `${(-headWorldPos.y * 0.5 + 0.5) * window.innerHeight}px`;
+
+      // 소연 구역 말풍선 좌표
+      const soyeonWorldPos = new THREE.Vector3(soyeonNpc.position.x, 2.55, soyeonNpc.position.z);
+      soyeonWorldPos.project(camera);
+      soyeonBubble.style.left = `${(soyeonWorldPos.x * 0.5 + 0.5) * window.innerWidth}px`;
+      soyeonBubble.style.top = `${(-soyeonWorldPos.y * 0.5 + 0.5) * window.innerHeight}px`;
+
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    animate();
+  </script>
+</body>
+</html>
