@@ -49,10 +49,10 @@
             border: 1.5px solid rgba(180, 170, 155, 0.45);
             box-shadow: 0 4px 12px rgba(45, 38, 30, 0.12);
             border-radius: 9999px;
-            padding: 4px 6px;
+            padding: 4px 12px;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 6px;
             font-size: 13px;
             font-weight: 700;
             color: #3a332c;
@@ -61,13 +61,11 @@
         .me-badge {
             background: #6b705c;
             color: #fff;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.04em;
-            padding: 2px 10px;
-            border-radius: 9999px;
-            width: auto;
-            height: auto;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -110,7 +108,8 @@
             <!-- 플레이어 머리 위 상태 알약 UI -->
             <div id="player-tag" class="floating-label">
                 <div class="status-pill">
-                    <span class="me-badge">NEWBIE</span>
+                    <span class="me-badge">나</span>
+                    <span id="pace-label-text">NEWBIE</span>
                 </div>
             </div>
             <!-- NPC 및 랜드마크 말풍선들이 동적으로 추가됨 -->
@@ -139,10 +138,31 @@
                     <span id="landmark-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-500 text-white">ZONE</span>
                     <span id="landmark-floor" class="text-[11px] font-semibold text-sky-700">1F 로비</span>
                 </div>
-                <h2 id="landmark-title" class="text-sm font-bold text-slate-800 mt-1">카페 코너 (Café Corner)</h2>
+                <h2 id="landmark-title" class="text-sm font-bold text-slate-800 mt-1">쿠카페 (CouCafe)</h2>
                 <p id="landmark-text" class="text-xs text-slate-600 mt-1 leading-relaxed">
                     향긋한 원두커피와 함께 동료들과 가볍게 담소를 나누는 공간입니다.
                 </p>
+
+                <!-- 게시판(쿠팡그룹 블라인드 / 당팡게시판) 게시글 읽기 목록 창 -->
+                <div id="board-post-list" class="hidden mt-2.5 pt-2 border-t border-sky-200/80 max-h-40 overflow-y-auto flex flex-col gap-1.5 pr-1"></div>
+
+                <!-- 게시판(쿠팡그룹 블라인드 / 당팡게시판 / 쿠테리아 식단표) 입력창 -->
+                <form id="board-post-form" class="hidden mt-3 pt-2.5 border-t border-sky-200/80 flex flex-col gap-1.5">
+                    <div class="flex gap-1.5">
+                        <select id="board-corner-select" class="hidden w-24 px-2 py-1.5 text-xs bg-white border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-500 text-stone-800 font-semibold">
+                            <option value="육식">육식</option>
+                            <option value="채식">채식</option>
+                        </select>
+                        <input id="board-nick-input" type="text" maxlength="10" placeholder="닉네임" class="w-24 px-2.5 py-1.5 text-xs bg-white border border-stone-300 rounded-lg focus:outline-none focus:border-sky-500 text-stone-800 select-text" />
+                        <input id="board-msg-input" type="text" maxlength="32" placeholder="게시판에 남길 메시지를 입력하세요" class="flex-1 min-w-0 px-2.5 py-1.5 text-xs bg-white border border-stone-300 rounded-lg focus:outline-none focus:border-sky-500 text-stone-800 select-text" />
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span id="board-post-feedback" class="text-[11px] font-medium text-emerald-700"></span>
+                        <button id="board-submit-btn" type="submit" class="px-3 py-1 bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold rounded-lg transition-all cursor-pointer">
+                            게시글 등록
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -177,9 +197,12 @@
         <!-- 하단 우측: 로비 구역 빠른 산책 안내 미니바 -->
         <div class="hidden sm:flex absolute bottom-5 right-5 z-20 bg-white/85 backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-lg border border-stone-200/80 items-center gap-3 text-xs text-stone-700">
             <span class="font-bold text-stone-900">탐방 구역:</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span>카페 코너</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span>쿠카페</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>쿠테리아 식단표</span>
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span>컬러 푸프 라운지</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>쿠팡 로켓 브랜드 월</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>디지털 현황 보드</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span>쿠팡그룹 블라인드</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-pink-500"></span>쿠팡굿즈샵 · 당팡게시판</span>
         </div>
     </div>
 
@@ -189,7 +212,8 @@
          * 사내 로비 3D 탐방 프로토타입 (Three.js 단일 파일 구현)
          * - 캐릭터: 하늘색 창모자, 하늘색 긴팔 맨투맨(남색 소매), 남색 바지, 흰 신발,
          *           쿠팡 로고 & 헤드셋 없는 증명사진이 들어간 사원증 목걸이 착용
-         * - 공간: 통유리 채광 로비, 카페 코너, 컬러 푸프 라운지, 쿠팡 로켓 브랜드 월 & 키오스크
+         * - 공간: 통유리 채광 1층 로비, 카페 코너, 컬러 푸프 라운지, 디지털 안내 보드 & 키오스크,
+         *         쿠팡그룹 블라인드 게시판, 쿠팡굿즈샵, 당팡게시판
          * ============================================================================
          */
 
@@ -201,10 +225,10 @@
         // 플레이어 상태 및 이동 파라미터
         const playerState = {
             position: new THREE.Vector3(0, 0, 4),
-            rotationY: Math.PI, // 정면(카메라 쪽)을 바라보도록 초기 설정
+            rotationY: Math.PI,
             velocity: new THREE.Vector3(),
             isMoving: false,
-            paceIndex: 0, // 0: 느린 발걸음, 1: 여유로운 산책, 2: 경쾌한 발걸음
+            paceIndex: 0,
             walkCycle: 0,
             currentFloor: 1
         };
@@ -217,9 +241,9 @@
 
         // 카메라 궤도(Orbit) 제어 파라미터
         const cameraControl = {
-            yaw: 0,          // 수평 회전각
-            pitch: 0.32,     // 수직 각도
-            distance: 7.5,   // 캐릭터와의 거리
+            yaw: 0,
+            pitch: 0.32,
+            distance: 7.5,
             minDistance: 3.5,
             maxDistance: 16.0,
             isDragging: false,
@@ -232,10 +256,220 @@
         const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
         const joystickInput = { x: 0, y: 0, active: false };
 
-        // 충돌 박스(장애물) 데이터
-        const colliders = []; // { minX, maxX, minZ, maxZ, minY, maxY }
-        const npcs = [];      // { group, head, el, msgEl, phrases, phraseIdx, timer, basePos }
-        const landmarks = []; // { id, badge, floor, title, text, pos, radius }
+        // 충돌 박스(장애물) 및 랜드마크 데이터
+        const colliders = [];
+        const npcs = [];
+        const landmarks = [];
+        let activeLandmarkId = null;
+
+        // 게시판 데이터 및 동적 리드로우 함수
+        const boardData = {
+            blind: [
+                { nick: '소연', msg: '퇴사할께요~ 아쉬울게 하나도 없거든요.' },
+                { nick: '김범석', msg: '열심히 일한 기록 남기지마' },
+                { nick: '로저스', msg: '새벽배송후 콩나물국밥 땡긴다.' }
+            ],
+            dangpang: [
+                { nick: '간식요정', msg: '딸기 샌드위치 & 아메리카노 당첨!' },
+                { nick: '로켓맨', msg: '오늘도 로켓처럼 안전하게!' },
+                { nick: '칭찬봇', msg: '동료들의 빠른 피드백 감사해요' },
+                { nick: '산책러', msg: '점심 산책 같이 가실 분?' }
+            ],
+            couteria: [
+                {
+                    title: '육식',
+                    badgeBg: '#fee2e2',
+                    badgeFg: '#b91c1c',
+                    cardBg: '#fef2f2',
+                    items: ['로제 함박스테이크 & 감자튀김', '바삭 제육볶음 · 계란말이', '차돌박이 된장찌개 & 솥밥']
+                },
+                {
+                    title: '채식',
+                    badgeBg: '#dcfce7',
+                    badgeFg: '#15803d',
+                    cardBg: '#f0fdf4',
+                    items: ['두부 스테이크 & 구운 채소', '리코타 치즈 & 계절과일 샐러드', '들깨 버섯순두부 & 현미밥']
+                }
+            ]
+        };
+        let blindCanvas, blindCtx, dangpangCanvas, dangpangCtx, menuCanvas, menuCtx;
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderBoardPostList(boardId) {
+            const listEl = document.getElementById('board-post-list');
+            if (!listEl) return;
+
+            if (boardId === 'couteria') {
+                listEl.innerHTML = boardData.couteria.map((corner, cIdx) => `
+                    <div class="bg-emerald-50/95 border border-emerald-200 rounded-xl px-2.5 py-2 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] font-bold text-emerald-800">${escapeHtml(corner.title)}</span>
+                            <span class="text-[10px] text-emerald-600 font-medium">오늘의 메뉴</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            ${corner.items.map((menuItem, mIdx) => `
+                                <div class="flex items-center justify-between gap-1.5 text-xs text-slate-800 bg-white/80 rounded-lg px-2 py-1 border border-emerald-100">
+                                    <span class="truncate">• ${escapeHtml(menuItem)}</span>
+                                    <button type="button" data-corner="${cIdx}" data-idx="${mIdx}" class="couteria-del-btn text-[10px] text-rose-500 hover:text-rose-700 font-bold shrink-0 cursor-pointer">삭제</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            const posts = boardId === 'blind' ? boardData.blind : boardData.dangpang;
+            const isBlind = boardId === 'blind';
+
+            listEl.innerHTML = posts.map(item => `
+                <div class="${isBlind ? 'bg-amber-50/95 border-amber-200' : 'bg-rose-50/95 border-rose-200'} border rounded-xl px-2.5 py-1.5 shadow-sm">
+                    <div class="text-[11px] font-bold ${isBlind ? 'text-amber-800' : 'text-rose-700'}">@${escapeHtml(item.nick)}</div>
+                    <div class="text-xs text-slate-800 leading-snug mt-0.5 break-words">${escapeHtml(item.msg)}</div>
+                </div>
+            `).join('');
+        }
+
+        function redrawBlindBoard() {
+            if (!blindCtx) return;
+            const blCtx = blindCtx;
+            blCtx.fillStyle = '#fffbeb';
+            blCtx.fillRect(0, 0, 640, 360);
+            blCtx.strokeStyle = '#d97706';
+            blCtx.lineWidth = 8;
+            blCtx.strokeRect(6, 6, 628, 348);
+
+            blCtx.fillStyle = '#92400e';
+            blCtx.fillRect(16, 16, 608, 56);
+            blCtx.fillStyle = '#ffffff';
+            blCtx.font = 'bold 28px "Noto Sans KR", sans-serif';
+            blCtx.textAlign = 'center';
+            blCtx.fillText('쿠팡그룹 블라인드', 320, 53);
+
+            blCtx.textAlign = 'left';
+            boardData.blind.slice(0, 3).forEach((entry, i) => {
+                const rowY = 96 + i * 78;
+                blCtx.fillStyle = '#fef3c7';
+                blCtx.beginPath();
+                blCtx.roundRect(24, rowY, 592, 62, 10);
+                blCtx.fill();
+                blCtx.fillStyle = '#b45309';
+                blCtx.font = 'bold 21px "Noto Sans KR", sans-serif';
+                blCtx.fillText(entry.nick, 40, rowY + 38);
+                blCtx.fillStyle = '#292524';
+                blCtx.font = '500 19px "Noto Sans KR", sans-serif';
+                blCtx.fillText(entry.msg, 152, rowY + 38);
+            });
+            if (customTextures.blindBoard) customTextures.blindBoard.needsUpdate = true;
+        }
+
+        function redrawDangpangBoard() {
+            if (!dangpangCtx) return;
+            const dpCtx = dangpangCtx;
+            const W = dangpangCanvas.width;
+            const H = dangpangCanvas.height;
+
+            dpCtx.fillStyle = '#fff1f2';
+            dpCtx.fillRect(0, 0, W, H);
+            dpCtx.strokeStyle = '#e11d48';
+            dpCtx.lineWidth = 10;
+            dpCtx.strokeRect(8, 8, W - 16, H - 16);
+
+            dpCtx.fillStyle = '#be123c';
+            dpCtx.fillRect(20, 20, W - 40, 68);
+            dpCtx.fillStyle = '#ffffff';
+            dpCtx.font = 'bold 34px "Noto Sans KR", sans-serif';
+            dpCtx.textAlign = 'center';
+            dpCtx.fillText('당팡게시판', W / 2, 66);
+
+            const cardStyles = [
+                { bg: '#ffe4e6', fg: '#be123c' },
+                { bg: '#ffedd5', fg: '#c2410c' },
+                { bg: '#fef9c3', fg: '#a16207' },
+                { bg: '#e0f2fe', fg: '#0369a1' }
+            ];
+            boardData.dangpang.slice(0, 4).forEach((item, i) => {
+                const col = i % 2;
+                const row = Math.floor(i / 2);
+                const x = 32 + col * 366;
+                const y = 108 + row * 184;
+                const st = cardStyles[i % cardStyles.length];
+                dpCtx.fillStyle = st.bg;
+                dpCtx.beginPath();
+                dpCtx.roundRect(x, y, 346, 164, 16);
+                dpCtx.fill();
+
+                dpCtx.fillStyle = st.fg;
+                dpCtx.font = 'bold 23px "Noto Sans KR", sans-serif';
+                dpCtx.textAlign = 'left';
+                dpCtx.fillText(`@${item.nick}`, x + 20, y + 46);
+
+                dpCtx.fillStyle = '#1e293b';
+                dpCtx.font = 'bold 21px "Noto Sans KR", sans-serif';
+                dpCtx.fillText(item.msg, x + 20, y + 98, 306);
+            });
+            if (customTextures.dangpangBoard) customTextures.dangpangBoard.needsUpdate = true;
+        }
+
+        function redrawCouTeriaMenu() {
+            if (!menuCtx) return;
+            const mnCtx = menuCtx;
+
+            mnCtx.fillStyle = '#f8fafc';
+            mnCtx.fillRect(0, 0, 720, 480);
+            mnCtx.strokeStyle = '#059669';
+            mnCtx.lineWidth = 10;
+            mnCtx.strokeRect(8, 8, 704, 464);
+
+            mnCtx.fillStyle = '#047857';
+            mnCtx.fillRect(18, 18, 684, 72);
+            mnCtx.fillStyle = '#ffffff';
+            mnCtx.font = 'bold 34px "Noto Sans KR", sans-serif';
+            mnCtx.textAlign = 'center';
+            mnCtx.textBaseline = 'middle';
+            mnCtx.fillText('쿠테리아 오늘의 식단표', 360, 54);
+
+            boardData.couteria.forEach((corner, idx) => {
+                const cx = 32 + idx * 336;
+                const cy = 110;
+                const cw = 320;
+                const ch = 336;
+
+                mnCtx.fillStyle = corner.cardBg;
+                mnCtx.beginPath();
+                mnCtx.roundRect(cx, cy, cw, ch, 16);
+                mnCtx.fill();
+
+                mnCtx.fillStyle = corner.badgeBg;
+                mnCtx.beginPath();
+                mnCtx.roundRect(cx + 20, cy + 18, cw - 40, 44, 10);
+                mnCtx.fill();
+
+                mnCtx.fillStyle = corner.badgeFg;
+                mnCtx.font = 'bold 23px "Noto Sans KR", sans-serif';
+                mnCtx.textAlign = 'center';
+                mnCtx.fillText(corner.title, cx + cw / 2, cy + 40);
+
+                mnCtx.fillStyle = '#1e293b';
+                mnCtx.font = '600 19px "Noto Sans KR", sans-serif';
+                mnCtx.textAlign = 'left';
+                const visibleItems = corner.items.slice(0, 4);
+                const lineGap = visibleItems.length > 3 ? 56 : 72;
+                visibleItems.forEach((line, lIdx) => {
+                    mnCtx.fillText(`• ${line}`, cx + 22, cy + 100 + lIdx * lineGap, cw - 44);
+                });
+            });
+
+            if (customTextures.couTeriaMenu) customTextures.couTeriaMenu.needsUpdate = true;
+        }
 
         // 초기화 실행
         window.onload = function () {
@@ -281,12 +515,10 @@
 
             container.appendChild(renderer.domElement);
 
-            // 따스한 실내외 자연광 조명 세팅
             const hemiLight = new THREE.HemisphereLight(0xfffaf0, 0xc8bfb0, 0.85);
             hemiLight.position.set(0, 20, 0);
             scene.add(hemiLight);
 
-            // 통유리 창문(좌측 X = -14 방향)에서 들어오는 따뜻한 오후 햇살
             const sunLight = new THREE.DirectionalLight(0xfff1d6, 1.15);
             sunLight.position.set(-18, 16, 10);
             sunLight.castShadow = true;
@@ -302,7 +534,6 @@
             sunLight.shadow.bias = -0.0005;
             scene.add(sunLight);
 
-            // 실내 천장 보조 따뜻한 포인트 라이트
             const lobbyWarmLight = new THREE.PointLight(0xffe4b5, 0.45, 25);
             lobbyWarmLight.position.set(2, 7.5, 2);
             scene.add(lobbyWarmLight);
@@ -311,7 +542,6 @@
             cafeLight.position.set(-8.5, 3.2, -1);
             scene.add(cafeLight);
 
-            // 창 크기 변경 대응
             window.addEventListener('resize', onWindowResize);
         }
 
@@ -325,37 +555,33 @@
         }
 
         /**
-         * 2. 동적 캔버스 텍스처 생성 (사원증, 쿠팡 로켓 브랜드 월, 카페 간판, 키오스크, 바닥 질감)
+         * 2. 동적 캔버스 텍스처 생성
          */
         let customTextures = {};
 
         function createTexturesAndMaterials() {
-            // (A) 쿠팡 사원증 텍스처 (쿠팡 로고 + 헤드셋 없는 캐릭터 증명사진)
+            // (A) 쿠팡 사원증 텍스처
             const badgeCanvas = document.createElement('canvas');
             badgeCanvas.width = 256;
             badgeCanvas.height = 384;
             const bCtx = badgeCanvas.getContext('2d');
 
-            // 카드 배경
             bCtx.fillStyle = '#f8fafc';
             bCtx.fillRect(0, 0, 256, 384);
             bCtx.strokeStyle = '#cbd5e1';
             bCtx.lineWidth = 10;
             bCtx.strokeRect(5, 5, 246, 374);
 
-            // 상단 스트랩 고리 홀
             bCtx.fillStyle = '#94a3b8';
             bCtx.beginPath();
             bCtx.roundRect(98, 18, 60, 14, 7);
             bCtx.fill();
 
-            // 증명사진 프레임 배경
             bCtx.fillStyle = '#e2e8f0';
             bCtx.beginPath();
             bCtx.roundRect(58, 68, 140, 155, 16);
             bCtx.fill();
 
-            // 증명사진 속 캐릭터 (하늘색 모자 + 맨투맨, 헤드셋 없음)
             bCtx.fillStyle = '#89b4d8';
             bCtx.beginPath();
             bCtx.arc(128, 225, 48, Math.PI, 0);
@@ -388,7 +614,6 @@
             bCtx.arc(128, 153, 8, 0.15 * Math.PI, 0.85 * Math.PI);
             bCtx.stroke();
 
-            // 하단 coupang 로고
             bCtx.font = 'bold 34px Arial, sans-serif';
             const logoParts = [
                 { text: 'coup', color: '#4a2c18' },
@@ -408,123 +633,39 @@
             customTextures.idBadge = new THREE.CanvasTexture(badgeCanvas);
             customTextures.idBadge.encoding = THREE.sRGBEncoding;
 
-            // (B) 사내 게시판 -> 쿠팡 로켓 로고 브랜드 월 텍스처
+            // (B) 사내 현황 보드 텍스처 (쿠팡 로고만 표시)
             const boardCanvas = document.createElement('canvas');
-            boardCanvas.width = 640;
-            boardCanvas.height = 360;
+            boardCanvas.width = 512;
+            boardCanvas.height = 320;
             const mCtx = boardCanvas.getContext('2d');
+            mCtx.fillStyle = '#15325b';
+            mCtx.fillRect(0, 0, 512, 320);
+            mCtx.strokeStyle = '#38bdf8';
+            mCtx.lineWidth = 6;
+            mCtx.strokeRect(10, 10, 492, 300);
 
-            // 깔끔한 화이트 & 은은한 스카이블루 그라데이션 배경
-            const bgGrad = mCtx.createLinearGradient(0, 0, 640, 360);
-            bgGrad.addColorStop(0, '#ffffff');
-            bgGrad.addColorStop(1, '#f0f9ff');
-            mCtx.fillStyle = bgGrad;
-            mCtx.fillRect(0, 0, 640, 360);
-
-            // 테두리 프레임 포인트
-            mCtx.strokeStyle = '#00a8e8';
-            mCtx.lineWidth = 8;
-            mCtx.strokeRect(8, 8, 624, 344);
-
-            // 장식용 궤도 곡선 (로켓 속도감 표현)
-            mCtx.strokeStyle = 'rgba(0, 168, 232, 0.16)';
-            mCtx.lineWidth = 5;
-            mCtx.beginPath();
-            mCtx.arc(465, 195, 110, -Math.PI * 0.75, Math.PI * 0.25);
-            mCtx.stroke();
-
-            // 좌측: coupang 시그니처 컬러 워드마크
-            mCtx.font = '900 66px Arial, sans-serif';
+            mCtx.font = 'bold 84px Arial, sans-serif';
             mCtx.textAlign = 'left';
             mCtx.textBaseline = 'middle';
-            const brandParts = [
-                { text: 'coup', color: '#4a2c18' },
-                { text: 'a', color: '#e53935' },
-                { text: 'n', color: '#fbc02d' },
-                { text: 'g', color: '#43a047' }
+            const boardLogoParts = [
+                { text: 'coup', color: '#ffffff' },
+                { text: 'a', color: '#ef4444' },
+                { text: 'n', color: '#facc15' },
+                { text: 'g', color: '#4ade80' }
             ];
-            let brandX = 68;
-            const brandY = 182;
-            brandParts.forEach(part => {
-                mCtx.fillStyle = part.color;
-                mCtx.fillText(part.text, brandX, brandY);
-                brandX += mCtx.measureText(part.text).width;
+            let totalLogoWidth = 0;
+            boardLogoParts.forEach(p => {
+                totalLogoWidth += mCtx.measureText(p.text).width;
             });
-
-            // 우측: 쿠팡 로켓(Rocket) 아이콘 일러스트 (45도 우상향 비행)
-            mCtx.save();
-            mCtx.translate(455, 178);
-            mCtx.rotate(-Math.PI / 4);
-
-            // 추진 불꽃 (오렌지 & 골드)
-            mCtx.fillStyle = '#f97316';
-            mCtx.beginPath();
-            mCtx.moveTo(-48, -14);
-            mCtx.lineTo(-84, 0);
-            mCtx.lineTo(-48, 14);
-            mCtx.closePath();
-            mCtx.fill();
-
-            mCtx.fillStyle = '#facc15';
-            mCtx.beginPath();
-            mCtx.moveTo(-48, -8);
-            mCtx.lineTo(-68, 0);
-            mCtx.lineTo(-48, 8);
-            mCtx.closePath();
-            mCtx.fill();
-
-            // 상/하단 날개 (딥 블루)
-            mCtx.fillStyle = '#0284c7';
-            mCtx.beginPath();
-            mCtx.moveTo(-22, -22);
-            mCtx.lineTo(-46, -42);
-            mCtx.lineTo(-42, -16);
-            mCtx.closePath();
-            mCtx.fill();
-
-            mCtx.beginPath();
-            mCtx.moveTo(-22, 22);
-            mCtx.lineTo(-46, 42);
-            mCtx.lineTo(-42, 16);
-            mCtx.closePath();
-            mCtx.fill();
-
-            // 로켓 동체 (쿠팡 시그니처 블루)
-            mCtx.fillStyle = '#00a8e8';
-            mCtx.beginPath();
-            mCtx.moveTo(64, 0);
-            mCtx.quadraticCurveTo(28, -28, -42, -22);
-            mCtx.lineTo(-48, 0);
-            mCtx.lineTo(-42, 22);
-            mCtx.quadraticCurveTo(28, 28, 64, 0);
-            mCtx.closePath();
-            mCtx.fill();
-
-            // 로켓 노즈콘(앞부분) 하이라이트
-            mCtx.fillStyle = '#0369a1';
-            mCtx.beginPath();
-            mCtx.moveTo(64, 0);
-            mCtx.quadraticCurveTo(46, -13, 30, -14);
-            mCtx.lineTo(30, 14);
-            mCtx.quadraticCurveTo(46, 13, 64, 0);
-            mCtx.closePath();
-            mCtx.fill();
-
-            // 로켓 중앙 원형 창문
-            mCtx.fillStyle = '#ffffff';
-            mCtx.beginPath();
-            mCtx.arc(4, 0, 13, 0, Math.PI * 2);
-            mCtx.fill();
-            mCtx.strokeStyle = '#0369a1';
-            mCtx.lineWidth = 4;
-            mCtx.stroke();
-
-            mCtx.restore();
-
+            let bLogoX = (512 - totalLogoWidth) / 2;
+            boardLogoParts.forEach(p => {
+                mCtx.fillStyle = p.color;
+                mCtx.fillText(p.text, bLogoX, 162);
+                bLogoX += mCtx.measureText(p.text).width;
+            });
             customTextures.mapBoard = new THREE.CanvasTexture(boardCanvas);
             customTextures.mapBoard.encoding = THREE.sRGBEncoding;
-
-            // (C) 카페 코너 간판 텍스처
+            // (C) 쿠카페 간판 텍스처
             const cafeCanvas = document.createElement('canvas');
             cafeCanvas.width = 512;
             cafeCanvas.height = 128;
@@ -532,9 +673,10 @@
             cCtx.fillStyle = '#292524';
             cCtx.fillRect(0, 0, 512, 128);
             cCtx.fillStyle = '#fef3c7';
-            cCtx.font = 'bold 48px Georgia, serif';
+            cCtx.font = 'bold 46px "Noto Sans KR", sans-serif';
             cCtx.textAlign = 'center';
-            cCtx.fillText('Café Corner', 256, 80);
+            cCtx.textBaseline = 'middle';
+            cCtx.fillText('쿠카페', 256, 66);
             customTextures.cafeSign = new THREE.CanvasTexture(cafeCanvas);
             customTextures.cafeSign.encoding = THREE.sRGBEncoding;
 
@@ -558,13 +700,106 @@
             kCtx.fillRect(24, 261, 208, 65);
             kCtx.fillStyle = '#0369a1';
             kCtx.font = 'bold 18px "Noto Sans KR", sans-serif';
-            kCtx.fillText('1F 카페 & 라운지', 128, 134);
+            kCtx.fillText('1F 쿠카페 & 라운지', 128, 134);
             kCtx.fillText('2F 오픈 워크스페이스', 128, 217);
             kCtx.fillText('사원 방문 체크인', 128, 300);
             customTextures.kioskScreen = new THREE.CanvasTexture(kioskCanvas);
             customTextures.kioskScreen.encoding = THREE.sRGBEncoding;
 
-            // (E) 콘크리트 타일 로비 바닥 텍스처
+            // (E) 쿠팡그룹 블라인드 게시판 텍스처
+            blindCanvas = document.createElement('canvas');
+            blindCanvas.width = 640;
+            blindCanvas.height = 360;
+            blindCtx = blindCanvas.getContext('2d');
+            customTextures.blindBoard = new THREE.CanvasTexture(blindCanvas);
+            customTextures.blindBoard.encoding = THREE.sRGBEncoding;
+            redrawBlindBoard();
+
+            // (F) 당팡게시판 텍스처
+            dangpangCanvas = document.createElement('canvas');
+            dangpangCanvas.width = 768;
+            dangpangCanvas.height = 512;
+            dangpangCtx = dangpangCanvas.getContext('2d');
+            customTextures.dangpangBoard = new THREE.CanvasTexture(dangpangCanvas);
+            customTextures.dangpangBoard.encoding = THREE.sRGBEncoding;
+            redrawDangpangBoard();
+
+            // (G) 쿠팡굿즈샵 간판 텍스처
+            const goodsSignCanvas = document.createElement('canvas');
+            goodsSignCanvas.width = 512;
+            goodsSignCanvas.height = 128;
+            const gsCtx = goodsSignCanvas.getContext('2d');
+            gsCtx.fillStyle = '#ea580c';
+            gsCtx.fillRect(0, 0, 512, 128);
+            gsCtx.fillStyle = '#ffffff';
+            gsCtx.font = 'bold 44px "Noto Sans KR", sans-serif';
+            gsCtx.textAlign = 'center';
+            gsCtx.textBaseline = 'middle';
+            gsCtx.fillText('쿠팡굿즈샵', 256, 66);
+            customTextures.goodsSign = new THREE.CanvasTexture(goodsSignCanvas);
+            customTextures.goodsSign.encoding = THREE.sRGBEncoding;
+
+            // (G-2) 쿠팡 기프트카드(상품권) 앞면 텍스처
+            const giftCardCanvas = document.createElement('canvas');
+            giftCardCanvas.width = 512;
+            giftCardCanvas.height = 320;
+            const gcCtx = giftCardCanvas.getContext('2d');
+            const gcGrad = gcCtx.createLinearGradient(0, 0, 512, 320);
+            gcGrad.addColorStop(0, '#fff7ed');
+            gcGrad.addColorStop(1, '#ffedd5');
+            gcCtx.fillStyle = gcGrad;
+            gcCtx.fillRect(0, 0, 512, 320);
+            gcCtx.strokeStyle = '#f97316';
+            gcCtx.lineWidth = 14;
+            gcCtx.strokeRect(10, 10, 492, 300);
+
+            // 골드 리본 포인트
+            gcCtx.fillStyle = '#fb923c';
+            gcCtx.fillRect(16, 54, 480, 16);
+            gcCtx.fillStyle = '#facc15';
+            gcCtx.beginPath();
+            gcCtx.arc(256, 62, 24, 0, Math.PI * 2);
+            gcCtx.fill();
+
+            // coupang 로고 & 상품권 문구
+            gcCtx.font = 'bold 54px Arial, sans-serif';
+            gcCtx.textAlign = 'left';
+            const gcLogoParts = [
+                { text: 'coup', color: '#4a2c18' },
+                { text: 'a', color: '#e53935' },
+                { text: 'n', color: '#eab308' },
+                { text: 'g', color: '#16a34a' }
+            ];
+            let gcTotalW = 0;
+            gcLogoParts.forEach(p => { gcTotalW += gcCtx.measureText(p.text).width; });
+            let gcX = (512 - gcTotalW) / 2;
+            gcLogoParts.forEach(p => {
+                gcCtx.fillStyle = p.color;
+                gcCtx.fillText(p.text, gcX, 158);
+                gcX += gcCtx.measureText(p.text).width;
+            });
+
+            gcCtx.fillStyle = '#9a3412';
+            gcCtx.font = 'bold 34px "Noto Sans KR", sans-serif';
+            gcCtx.textAlign = 'center';
+            gcCtx.fillText('쿠팡 기프트 상품권', 256, 224);
+            gcCtx.fillStyle = '#ea580c';
+            gcCtx.font = 'bold 26px "Noto Sans KR", sans-serif';
+            gcCtx.fillText('₩ 50,000', 256, 268);
+
+            customTextures.giftCard = new THREE.CanvasTexture(giftCardCanvas);
+            customTextures.giftCard.encoding = THREE.sRGBEncoding;
+
+            // (G-3) 쿠테리아 오늘의 식단표 텍스처
+            menuCanvas = document.createElement('canvas');
+            menuCanvas.width = 720;
+            menuCanvas.height = 480;
+            menuCtx = menuCanvas.getContext('2d');
+            customTextures.couTeriaMenu = new THREE.CanvasTexture(menuCanvas);
+            customTextures.couTeriaMenu.encoding = THREE.sRGBEncoding;
+            redrawCouTeriaMenu();
+
+            // (H) 콘크리트 타일 로비 바닥 텍스처
             const floorCanvas = document.createElement('canvas');
             floorCanvas.width = 512;
             floorCanvas.height = 512;
@@ -590,12 +825,11 @@
         }
 
         /**
-         * 3. 사내 로비 건축 구조 (바닥, 통유리 창문, 기둥, 우드 천장, 행잉 플랜트)
+         * 3. 사내 로비 건축 구조
          */
         function buildLobbyEnvironment() {
             const lobbyGroup = new THREE.Group();
 
-            // 1층 메인 바닥 (28 x 28)
             const floorGeo = new THREE.PlaneGeometry(28, 28);
             const floorMat = new THREE.MeshStandardMaterial({
                 map: customTextures.lobbyFloor,
@@ -607,7 +841,6 @@
             floorMesh.receiveShadow = true;
             lobbyGroup.add(floorMesh);
 
-            // 중앙 산책 유도 연베이지 카펫 러너
             const rugGeo = new THREE.PlaneGeometry(6.5, 16);
             const rugMat = new THREE.MeshStandardMaterial({ color: 0xe3dcd0, roughness: 0.85 });
             const rugMesh = new THREE.Mesh(rugGeo, rugMat);
@@ -616,7 +849,6 @@
             rugMesh.receiveShadow = true;
             lobbyGroup.add(rugMesh);
 
-            // 우드 천장 루버 (높이 9.2m)
             const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xb88b5a, roughness: 0.6 });
             const ceilingBase = new THREE.Mesh(new THREE.BoxGeometry(28, 0.4, 28), ceilingMat);
             ceilingBase.position.set(0, 9.4, 0);
@@ -628,7 +860,6 @@
                 lobbyGroup.add(beam);
             }
 
-            // 좌측 대형 통유리 창문 벽 (X = -13.5)
             const frameMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.4, metalness: 0.5 });
             const glassMat = new THREE.MeshPhysicalMaterial({
                 color: 0xe0f2fe,
@@ -642,7 +873,6 @@
             glassPane.position.set(-13.4, 4.5, 0);
             lobbyGroup.add(glassPane);
 
-            // 통유리 창살 프레임
             for (let z = -12; z <= 12; z += 3) {
                 const vMullion = new THREE.Mesh(new THREE.BoxGeometry(0.22, 9.2, 0.18), frameMat);
                 vMullion.position.set(-13.4, 4.6, z);
@@ -655,7 +885,6 @@
                 lobbyGroup.add(hMullion);
             }
 
-            // 창밖 밝은 햇살 배경
             const outsideBackdrop = new THREE.Mesh(
                 new THREE.PlaneGeometry(36, 18),
                 new THREE.MeshBasicMaterial({ color: 0xfff8eb })
@@ -664,7 +893,6 @@
             outsideBackdrop.position.set(-18, 7, 0);
             lobbyGroup.add(outsideBackdrop);
 
-            // 외벽 (뒷벽 Z = -13.5, 우측벽 X = 13.5)
             const wallMat = new THREE.MeshStandardMaterial({ color: 0xe5dfd5, roughness: 0.8 });
             const backWall = new THREE.Mesh(new THREE.BoxGeometry(28, 9.4, 0.5), wallMat);
             backWall.position.set(0, 4.7, -13.5);
@@ -676,7 +904,12 @@
             rightWall.receiveShadow = true;
             lobbyGroup.add(rightWall);
 
-            // 구조 콘크리트 기둥
+            // 남쪽 벽면 (캐릭터 초기 정면 방향 Z = 13.75)
+            const frontWall = new THREE.Mesh(new THREE.BoxGeometry(28, 9.4, 0.5), wallMat);
+            frontWall.position.set(0, 4.7, 13.75);
+            frontWall.receiveShadow = true;
+            lobbyGroup.add(frontWall);
+
             const concreteMat = new THREE.MeshStandardMaterial({ color: 0xa8a29e, roughness: 0.75 });
             const pillarPositions = [[-11.5, -6], [-11.5, 5], [11.5, -6], [11.5, 5]];
             pillarPositions.forEach(([px, pz]) => {
@@ -692,14 +925,14 @@
         }
 
         /**
-         * 4. 로비 주요 구역 가구 및 오브젝트 배치 (카페 코너, 컬러 푸프 라운지, 키오스크, 쿠팡 로켓 브랜드 월)
+         * 4. 로비 주요 구역 가구 및 오브젝트 배치
          */
         function buildFurnitureAndProps() {
             const propsGroup = new THREE.Group();
             const oakMat = new THREE.MeshStandardMaterial({ color: 0xc89d6c, roughness: 0.55 });
             const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x292524, roughness: 0.4, metalness: 0.5 });
 
-            // --- (1) 좌측 카페 코너 (Café Corner) ---
+            // --- (1) 좌측 카페 코너 ---
             const counter = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.05, 5.4), oakMat);
             counter.position.set(-11.2, 0.525, -1.2);
             counter.castShadow = true;
@@ -714,7 +947,6 @@
             signBoard.position.set(-10.1, 3.25, -1.2);
             propsGroup.add(signBoard);
 
-            // 대형 우드 커뮤니티 테이블
             const tableX = -7.8, tableZ = 1.6;
             const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.1, 3.6), oakMat);
             tableTop.position.set(tableX, 0.78, tableZ);
@@ -789,13 +1021,222 @@
                 addCollider(p.x - p.r * 0.85, p.x + p.r * 0.85, p.z - p.r * 0.85, p.z + p.r * 0.85, 0, 1.2);
             });
 
-            // --- (4) 우측 벽면 쿠팡 로켓 로고 브랜드 보드 ---
+            // --- (4) 우측 벽면 대형 디지털 네트워크 보드 ---
             const bigBoard = new THREE.Mesh(
                 new THREE.BoxGeometry(0.18, 2.5, 4.4),
                 new THREE.MeshStandardMaterial({ map: customTextures.mapBoard })
             );
             bigBoard.position.set(13.15, 2.35, 1.2);
             propsGroup.add(bigBoard);
+
+            // --- (4-B) 쿠팡그룹 블라인드 대형 게시판 (로비 북쪽 구역) ---
+            const blindBoard = new THREE.Mesh(
+                new THREE.BoxGeometry(4.4, 2.4, 0.18),
+                new THREE.MeshStandardMaterial({ map: customTextures.blindBoard, roughness: 0.45 })
+            );
+            blindBoard.position.set(-2.5, 2.2, -12.6);
+            blindBoard.castShadow = true;
+            propsGroup.add(blindBoard);
+
+            // --- (4-C) 남쪽 구역 쿠팡굿즈샵 ---
+            const goodsShop = new THREE.Group();
+            goodsShop.position.set(-3.2, 0, 9.6);
+
+            const shelfBack = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.4, 0.14), oakMat);
+            shelfBack.position.set(0, 1.2, 0.35);
+            shelfBack.castShadow = true;
+            goodsShop.add(shelfBack);
+
+            const shelfFloor1 = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 0.82), oakMat);
+            shelfFloor1.position.set(0, 1.1, 0);
+            shelfFloor1.castShadow = true;
+            goodsShop.add(shelfFloor1);
+
+            const shelfFloor2 = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 0.82), oakMat);
+            shelfFloor2.position.set(0, 1.98, 0);
+            shelfFloor2.castShadow = true;
+            goodsShop.add(shelfFloor2);
+
+            const goodsSign = new THREE.Mesh(
+                new THREE.BoxGeometry(2.5, 0.62, 0.12),
+                new THREE.MeshStandardMaterial({ map: customTextures.goodsSign, roughness: 0.4 })
+            );
+            goodsSign.position.set(0, 2.75, 0);
+            goodsShop.add(goodsSign);
+
+            // 1층 굿즈: 쿠팡 상품권(기프트카드) & 텀블러
+            const giftCardGroup = new THREE.Group();
+            giftCardGroup.position.set(-0.78, 1.16, 0);
+
+            // 우드 이젤 거치대
+            const easelBase = new THREE.Mesh(
+                new THREE.BoxGeometry(0.92, 0.06, 0.34),
+                new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.5 })
+            );
+            easelBase.position.set(0, 0.03, 0);
+            easelBase.castShadow = true;
+
+            const easelBack = new THREE.Mesh(
+                new THREE.BoxGeometry(0.14, 0.42, 0.06),
+                new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.5 })
+            );
+            easelBack.position.set(0, 0.22, 0.11);
+            easelBack.rotation.x = -0.32;
+
+            // 메인 상품권 카드 + 뒤쪽 겹쳐진 보조 상품권
+            const backVoucher = new THREE.Mesh(
+                new THREE.BoxGeometry(0.84, 0.52, 0.025),
+                new THREE.MeshStandardMaterial({ color: 0xfdba74, roughness: 0.35 })
+            );
+            backVoucher.position.set(0.06, 0.32, 0.04);
+            backVoucher.rotation.set(0.18, 0, -0.07);
+            backVoucher.castShadow = true;
+
+            const mainVoucher = new THREE.Mesh(
+                new THREE.BoxGeometry(0.86, 0.54, 0.03),
+                new THREE.MeshStandardMaterial({ map: customTextures.giftCard, roughness: 0.3 })
+            );
+            mainVoucher.position.set(-0.02, 0.31, -0.02);
+            mainVoucher.rotation.x = 0.22;
+            mainVoucher.castShadow = true;
+
+            giftCardGroup.add(easelBase, easelBack, backVoucher, mainVoucher);
+            goodsShop.add(giftCardGroup);
+
+            const tumblerMesh = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.12, 0.10, 0.36, 16),
+                new THREE.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.35 })
+            );
+            tumblerMesh.position.set(0.78, 1.34, 0);
+            tumblerMesh.castShadow = true;
+            const tumblerLid = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.125, 0.125, 0.05, 16),
+                new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 })
+            );
+            tumblerLid.position.set(0.78, 1.54, 0);
+            goodsShop.add(tumblerMesh, tumblerLid);
+
+            // 2층 굿즈: 머그컵, 티셔츠(소매·카라 디테일), 볼펜
+            const mugCup = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.13, 0.13, 0.25, 16),
+                new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35 })
+            );
+            mugCup.position.set(-1.0, 2.165, 0);
+            mugCup.castShadow = true;
+            const mugHandle = new THREE.Mesh(
+                new THREE.TorusGeometry(0.065, 0.02, 8, 14, Math.PI),
+                new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.35 })
+            );
+            mugHandle.position.set(-0.87, 2.165, 0);
+            mugHandle.rotation.z = -Math.PI / 2;
+            goodsShop.add(mugCup, mugHandle);
+
+            const tshirtGroup = new THREE.Group();
+            tshirtGroup.position.set(0, 2.21, 0);
+            const tshirtMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.48 });
+            const tshirtBody = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.34, 0.13), tshirtMat);
+            tshirtBody.castShadow = true;
+            const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.13, 0.12), tshirtMat);
+            sleeveL.position.set(-0.22, 0.09, 0);
+            sleeveL.rotation.z = 0.38;
+            const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.13, 0.12), tshirtMat);
+            sleeveR.position.set(0.22, 0.09, 0);
+            sleeveR.rotation.z = -0.38;
+            const tshirtCollar = new THREE.Mesh(
+                new THREE.TorusGeometry(0.075, 0.018, 8, 16, Math.PI),
+                new THREE.MeshStandardMaterial({ color: 0x0369a1, roughness: 0.5 })
+            );
+            tshirtCollar.position.set(0, 0.17, 0.02);
+            tshirtCollar.rotation.z = Math.PI;
+            tshirtGroup.add(tshirtBody, sleeveL, sleeveR, tshirtCollar);
+            goodsShop.add(tshirtGroup);
+
+            const penGroup = new THREE.Group();
+            penGroup.position.set(1.0, 2.11, 0);
+            const penStand = new THREE.Mesh(
+                new THREE.BoxGeometry(0.56, 0.05, 0.22),
+                new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.4 })
+            );
+            penStand.position.y = 0.025;
+            const penBarrel = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.032, 0.032, 0.46, 12),
+                new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.35 })
+            );
+            penBarrel.rotation.z = Math.PI / 2;
+            penBarrel.position.set(-0.02, 0.09, 0);
+            penBarrel.castShadow = true;
+            const penTip = new THREE.Mesh(
+                new THREE.ConeGeometry(0.032, 0.09, 12),
+                new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.7, roughness: 0.2 })
+            );
+            penTip.rotation.z = -Math.PI / 2;
+            penTip.position.set(0.255, 0.09, 0);
+            const penClicker = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.02, 0.02, 0.05, 10),
+                new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 })
+            );
+            penClicker.rotation.z = Math.PI / 2;
+            penClicker.position.set(-0.27, 0.09, 0);
+            const penClip = new THREE.Mesh(
+                new THREE.BoxGeometry(0.16, 0.015, 0.02),
+                new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.3 })
+            );
+            penClip.position.set(-0.14, 0.125, 0);
+            penGroup.add(penStand, penBarrel, penTip, penClicker, penClip);
+            goodsShop.add(penGroup);
+
+            propsGroup.add(goodsShop);
+            addCollider(-4.9, -1.5, 9.1, 10.2, 0, 3.0);
+
+            // --- (4-D) 남쪽 구역 당팡게시판 ---
+            const dangpangGroup = new THREE.Group();
+            dangpangGroup.position.set(2.8, 0, 9.6);
+
+            const dpFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(3.75, 2.55, 0.14),
+                darkMetalMat
+            );
+            dpFrame.position.set(0, 2.0, 0);
+            dpFrame.castShadow = true;
+            dangpangGroup.add(dpFrame);
+
+            const dpMat = new THREE.MeshBasicMaterial({ map: customTextures.dangpangBoard });
+            const dpFront = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 2.4), dpMat);
+            dpFront.position.set(0, 2.0, 0.08);
+            const dpBack = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 2.4), dpMat);
+            dpBack.position.set(0, 2.0, -0.08);
+            dpBack.rotation.y = Math.PI;
+            dangpangGroup.add(dpFront, dpBack);
+
+            [-1.65, 1.65].forEach((lx) => {
+                const post = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.3, 0.2), darkMetalMat);
+                post.position.set(lx, 1.65, 0);
+                post.castShadow = true;
+                dangpangGroup.add(post);
+            });
+
+            propsGroup.add(dangpangGroup);
+            addCollider(0.85, 4.75, 9.2, 10.0, 0, 3.4);
+
+            // --- (4-E) 북쪽 벽면 쿠테리아 식단표 보드 ---
+            const menuBoardGroup = new THREE.Group();
+            menuBoardGroup.position.set(4.5, 2.35, -13.15);
+
+            const menuFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(4.45, 2.95, 0.14),
+                darkMetalMat
+            );
+            menuFrame.castShadow = true;
+            menuBoardGroup.add(menuFrame);
+
+            const menuScreen = new THREE.Mesh(
+                new THREE.PlaneGeometry(4.25, 2.75),
+                new THREE.MeshBasicMaterial({ map: customTextures.couTeriaMenu })
+            );
+            menuScreen.position.z = 0.08;
+            menuBoardGroup.add(menuScreen);
+
+            propsGroup.add(menuBoardGroup);
 
             // --- (5) 로비 곳곳 관엽 화분 인테리어 ---
             const potLocations = [[-11.8, 7.5], [11.5, 7.5], [-4.2, -7.5], [11.2, -3.5]];
@@ -832,13 +1273,13 @@
             const skinMat = new THREE.MeshStandardMaterial({ color: 0xe09f7d, roughness: 0.65 });
             const cheekMat = new THREE.MeshStandardMaterial({ color: 0xd97b66, roughness: 0.8 });
             const skyBlueMat = new THREE.MeshStandardMaterial({ color: 0x8bb6db, roughness: 0.78 });
-            const capBrimMat = new THREE.MeshStandardMaterial({ color: 0x77a4cc, roughness: 0.75 });
+            const capCrownMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.65 });
+            const capBrimMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.6 });
             const navyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.82 });
             const shoeMat = new THREE.MeshStandardMaterial({ color: 0xf1efe9, roughness: 0.65 });
             const eyeMat = new THREE.MeshBasicMaterial({ color: 0x292018 });
             const strapMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 });
 
-            // 1) 다리 및 신발 (좌/우)
             const leftLegGroup = new THREE.Group();
             leftLegGroup.position.set(-0.22, 0.58, 0);
             const leftPant = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.17, 0.46, 16), navyMat);
@@ -869,7 +1310,6 @@
             playerGroup.add(rightLegGroup);
             playerParts.rightLeg = rightLegGroup;
 
-            // 2) 몸통 (하늘색 긴팔 스웨트셔츠)
             const bodyGroup = new THREE.Group();
             bodyGroup.position.set(0, 1.05, 0);
 
@@ -888,7 +1328,6 @@
             collar.position.y = 0.43;
             bodyGroup.add(collar);
 
-            // 3) 쿠팡 사원증 목걸이
             const lanyardLeft = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.48, 0.015), strapMat);
             lanyardLeft.position.set(-0.11, 0.24, 0.46);
             lanyardLeft.rotation.z = -0.24;
@@ -918,7 +1357,6 @@
             bodyGroup.add(badgeMesh);
             playerParts.badge = badgeMesh;
 
-            // 4) 양팔
             function createArm(isLeft) {
                 const sign = isLeft ? -1 : 1;
                 const armPivot = new THREE.Group();
@@ -949,7 +1387,6 @@
             bodyGroup.add(playerParts.leftArm);
             bodyGroup.add(playerParts.rightArm);
 
-            // 5) 머리 + 얼굴 표정 + 하늘색 창모자
             const headGroup = new THREE.Group();
             headGroup.position.set(0, 0.92, 0);
 
@@ -985,10 +1422,10 @@
             smileMesh.position.set(0, -0.13, 0.51);
             smileMesh.rotation.z = Math.PI * 1.11;
             headGroup.add(smileMesh);
-
+            // 하늘색 볼캡(창모자) 크라운
             const capCrown = new THREE.Mesh(
                 new THREE.SphereGeometry(0.575, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.52),
-                skyBlueMat
+                capCrownMat
             );
             capCrown.position.set(0, 0.04, 0);
             capCrown.rotation.x = -0.08;
@@ -1015,10 +1452,21 @@
         }
 
         /**
-         * 7. 로비 속 동료 NPC 사원들 생성
+         * 6. 로비 속 동료 NPC 사원들 생성 (원래 소연 위치·캐릭터·대사 복원)
          */
         function spawnNPCCoworkers() {
             const npcConfigs = [
+                {
+                    name: '소연',
+                    x: 8.3, y: 0, z: 0.6, rotY: -Math.PI * 0.38,
+                    isSoyeon: true,
+                    shirtColor: 0xf43f5e, pantColor: 0x1e293b, hairColor: 0x3b2314,
+                    phrases: [
+                        '퇴사할께요~ 아쉬울게 하나도 없거든요.',
+                        '저 퇴사할 거라 이제 눈치 안 봐요 😎',
+                        '자유를 찾아 떠납니다! 다들 수고하세요~'
+                    ]
+                },
                 {
                     name: '김민수 매니저',
                     x: -6.1, y: 0, z: 1.5, rotY: Math.PI * 0.5,
@@ -1026,17 +1474,10 @@
                     phrases: ['오늘 커피 향이 정말 좋네요 ☕', '점심 식사 맛있게 하셨어요?', '로비 햇살이 따뜻해서 산책하기 딱이에요!']
                 },
                 {
-                    name: '소연',
-                    x: 8.3, y: 0, z: 0.6, rotY: -Math.PI * 0.5,
-                    isFemale: true,
-                    shirtColor: 0xe89b72, pantColor: 0x3f4a5c, hairColor: 0x4a2c18,
-                    phrases: ['퇴사할께요']
-                },
-                {
                     name: '박현우 엔지니어',
                     x: -3.2, y: 0, z: -2.8, rotY: 0.35,
                     shirtColor: 0x7c93c3, pantColor: 0x1e293b, hairColor: 0x1c1917,
-                    phrases: ['새 사원증 디자인 깔끔하네요 👍', '우측 벽면 쿠팡 로켓 로고 월도 구경해 보세요!', '카페 코너 커피도 맛있어요 ☕']
+                    phrases: ['새 사원증 디자인 깔끔하네요 👍', '사내 현황 보드도 한번 구경해 보세요!', '남쪽 굿즈샵이랑 당팡게시판도 들러보세요!']
                 }
             ];
 
@@ -1048,122 +1489,61 @@
                 npcGroup.rotation.y = cfg.rotY;
 
                 const skinMat = new THREE.MeshStandardMaterial({ color: 0xe3a887, roughness: 0.65 });
-                const cheekMat = new THREE.MeshStandardMaterial({ color: 0xd97b66, roughness: 0.8 });
                 const shirtMat = new THREE.MeshStandardMaterial({ color: cfg.shirtColor, roughness: 0.8 });
                 const pantMat = new THREE.MeshStandardMaterial({ color: cfg.pantColor, roughness: 0.8 });
                 const hairMat = new THREE.MeshStandardMaterial({ color: cfg.hairColor, roughness: 0.85 });
 
                 [-0.18, 0.18].forEach(lx => {
-                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(cfg.isFemale ? 0.135 : 0.15, cfg.isFemale ? 0.12 : 0.14, 0.55, 12), pantMat);
+                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.14, 0.55, 12), pantMat);
                     leg.position.set(lx, 0.28, 0);
                     leg.castShadow = true;
                     npcGroup.add(leg);
                 });
 
-                const body = new THREE.Mesh(
-                    new THREE.CylinderGeometry(cfg.isFemale ? 0.33 : 0.38, cfg.isFemale ? 0.39 : 0.42, 0.8, 18),
-                    shirtMat
-                );
+                const body = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.42, 0.8, 18), shirtMat);
                 body.position.y = 0.95;
                 body.castShadow = true;
                 npcGroup.add(body);
 
-                // 여성 캐릭터일 경우 부드러운 플레어 스커트 라인 포인트 추가
-                if (cfg.isFemale) {
-                    const skirt = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.35, 0.48, 0.34, 18),
-                        pantMat
-                    );
-                    skirt.position.y = 0.54;
-                    skirt.castShadow = true;
-                    npcGroup.add(skirt);
-                }
-
-                [-0.42, 0.42].forEach((ax, i) => {
-                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(cfg.isFemale ? 0.095 : 0.11, cfg.isFemale ? 0.085 : 0.10, 0.52, 12), shirtMat);
+                [-0.44, 0.44].forEach((ax, i) => {
+                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.10, 0.52, 12), shirtMat);
                     arm.position.set(ax, 0.96, 0);
-                    arm.rotation.z = i === 0 ? -0.22 : 0.22;
+                    arm.rotation.z = i === 0 ? -0.2 : 0.2;
                     npcGroup.add(arm);
                 });
 
                 const headGroup = new THREE.Group();
                 headGroup.position.y = 1.75;
-                const head = new THREE.Mesh(new THREE.SphereGeometry(0.45, 20, 18), skinMat);
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.46, 20, 18), skinMat);
                 head.castShadow = true;
-                head.receiveShadow = true;
                 headGroup.add(head);
 
-                // 헤어스타일 (여성 캐릭터는 눈을 가리지 않도록 짧고 깔끔한 뱅/단발 스타일로 표현)
                 const hair = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.47, 20, 14, 0, Math.PI * 2, 0, cfg.isFemale ? Math.PI * 0.42 : Math.PI * 0.56),
+                    new THREE.SphereGeometry(0.48, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.56),
                     hairMat
                 );
-                hair.rotation.x = cfg.isFemale ? -0.35 : -0.25;
-                hair.position.y = cfg.isFemale ? 0.04 : 0;
-                hair.castShadow = true;
+                hair.rotation.x = -0.25;
                 headGroup.add(hair);
 
-                if (cfg.isFemale) {
-                    // 짧고 귀여운 숏단발 옆머리 (턱선 위까지 짧게 조정)
-                    [-0.42, 0.42].forEach(hx => {
-                        const sideHairGroup = new THREE.Group();
-                        sideHairGroup.position.set(hx, 0.02, -0.02);
-
-                        const sideCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.095, 0.16, 12), hairMat);
-                        sideCyl.castShadow = true;
-                        sideHairGroup.add(sideCyl);
-
-                        const topCap = new THREE.Mesh(new THREE.SphereGeometry(0.10, 12, 10), hairMat);
-                        topCap.position.y = 0.08;
-                        topCap.castShadow = true;
-                        sideHairGroup.add(topCap);
-
-                        const bottomCap = new THREE.Mesh(new THREE.SphereGeometry(0.095, 12, 10), hairMat);
-                        bottomCap.position.y = -0.08;
-                        bottomCap.castShadow = true;
-                        sideHairGroup.add(bottomCap);
-
-                        headGroup.add(sideHairGroup);
-                    });
-
-                    // 짧게 다듬은 뒷머리
-                    const backHair = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.38, 0.20, 16), hairMat);
-                    backHair.position.set(0, -0.02, -0.15);
+                // 소연 전용 긴 생머리 & 포니테일 디테일 복원
+                if (cfg.isSoyeon) {
+                    const backHair = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.72, 0.28), hairMat);
+                    backHair.position.set(0, -0.18, -0.32);
                     backHair.castShadow = true;
                     headGroup.add(backHair);
 
-                    [-0.24, 0.24].forEach(cx => {
-                        const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 10), cheekMat);
-                        cheek.scale.set(1.2, 0.8, 0.3);
-                        cheek.position.set(cx, -0.08, 0.41);
-                        headGroup.add(cheek);
-                    });
+                    const ponytail = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.16, 0.55, 12), hairMat);
+                    ponytail.position.set(0, -0.14, -0.48);
+                    ponytail.rotation.x = 0.28;
+                    headGroup.add(ponytail);
                 }
 
-                // 눈, 코, 입 표현 (머리카락에 가리지 않도록 정면 노출)
                 const eyeMat = new THREE.MeshBasicMaterial({ color: 0x221c18 });
-                const eyeRadius = cfg.isFemale ? 0.042 : 0.035;
-                const eyeZ = cfg.isFemale ? 0.445 : 0.42;
-
-                [-0.145, 0.145].forEach(ex => {
-                    const eye = new THREE.Mesh(new THREE.SphereGeometry(eyeRadius, 10, 10), eyeMat);
-                    eye.position.set(ex, 0.02, eyeZ);
+                [-0.14, 0.14].forEach(ex => {
+                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), eyeMat);
+                    eye.position.set(ex, 0.02, 0.43);
                     headGroup.add(eye);
                 });
-
-                if (cfg.isFemale) {
-                    // 귀여운 코
-                    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.048, 10, 10), skinMat);
-                    nose.position.set(0, -0.035, 0.455);
-                    headGroup.add(nose);
-
-                    // 입 (미소/표정 곡선)
-                    const mouthCurve = new THREE.TorusGeometry(0.075, 0.015, 8, 16, Math.PI * 0.75);
-                    const mouthMesh = new THREE.Mesh(mouthCurve, eyeMat);
-                    mouthMesh.position.set(0, -0.115, 0.435);
-                    mouthMesh.rotation.z = Math.PI * 1.125;
-                    headGroup.add(mouthMesh);
-                }
 
                 npcGroup.add(headGroup);
                 scene.add(npcGroup);
@@ -1174,7 +1554,7 @@
                 bubbleWrapper.className = 'floating-label hidden';
                 bubbleWrapper.innerHTML = `
                     <div class="npc-bubble">
-                        <span class="font-bold text-sky-700 mr-1">${cfg.name}</span>
+                        <span class="font-bold ${cfg.isSoyeon ? 'text-rose-600' : 'text-sky-700'} mr-1">${cfg.name}</span>
                         <span class="npc-msg">${cfg.phrases[0]}</span>
                     </div>
                 `;
@@ -1183,7 +1563,6 @@
                 npcs.push({
                     group: npcGroup,
                     head: headGroup,
-                    baseHeadRotY: headGroup.rotation.y,
                     el: bubbleWrapper,
                     msgEl: bubbleWrapper.querySelector('.npc-msg'),
                     phrases: cfg.phrases,
@@ -1195,16 +1574,16 @@
         }
 
         /**
-         * 8. 로비 랜드마크 구역 트리거 설정
+         * 7. 로비 랜드마크 구역 트리거 설정
          */
         function setupLandmarks() {
             landmarks.push(
                 {
                     id: 'cafe',
-                    badge: 'CAFÉ CORNER',
+                    badge: 'COUCAFE',
                     floor: '1F 좌측 창가',
-                    title: '사내 카페 코너 (Café Corner)',
-                    text: '통유리창으로 들어오는 자연광 아래 커피를 마시며 자유롭게 협업하는 라운지 테이블입니다.',
+                    title: '쿠카페 (CouCafe)',
+                    text: '통유리창으로 들어오는 자연광 아래 커피를 마시며 자유롭게 협업하는 쿠카페 라운지 테이블입니다.',
                     pos: new THREE.Vector3(-8.2, 0, 1.0),
                     radius: 3.6
                 },
@@ -1213,7 +1592,7 @@
                     badge: 'SMART KIOSK',
                     floor: '1F 로비 중앙',
                     title: '스마트 안내 키오스크',
-                    text: '층별 안내와 방문 체크인을 지원하는 터치스크린 키오스크입니다.',
+                    text: '로비 시설 안내와 방문 체크인을 지원하는 터치스크린 키오스크입니다.',
                     pos: new THREE.Vector3(-5.2, 0, -3.5),
                     radius: 2.6
                 },
@@ -1228,24 +1607,60 @@
                 },
                 {
                     id: 'board',
-                    badge: 'COUPANG ROCKET',
+                    badge: 'NETWORK BOARD',
                     floor: '1F 우측 벽면',
-                    title: '쿠팡 로켓 브랜드 월',
-                    text: '빠르고 혁신적인 로켓 배송을 상징하는 쿠팡 로켓 로고 디스플레이입니다.',
+                    title: '사내 로비 & 물류 현황 보드',
+                    text: '실시간 네트워크 연결과 주요 거점을 시각적으로 보여주는 대형 디스플레이입니다.',
                     pos: new THREE.Vector3(11.6, 0, 1.2),
                     radius: 3.0
+                },
+                {
+                    id: 'blind',
+                    badge: 'BLIND BOARD',
+                    floor: '1F 북쪽 게시판',
+                    title: '쿠팡그룹 블라인드',
+                    text: '사원들의 솔직한 한마디가 모이는 쿠팡그룹 블라인드 게시판입니다.',
+                    pos: new THREE.Vector3(-2.5, 0, -10.8),
+                    radius: 3.4
+                },
+                {
+                    id: 'goods',
+                    badge: 'GOODS SHOP',
+                    floor: '1F 남쪽 굿즈존',
+                    title: '쿠팡굿즈샵',
+                    text: '1층에는 쿠팡 상품권·텀블러, 2층에는 머그컵·티셔츠·볼펜이 진열되어 있습니다.',
+                    pos: new THREE.Vector3(-3.2, 0, 7.8),
+                    radius: 3.4
+                },
+                {
+                    id: 'dangpang',
+                    badge: 'DANGPANG BOARD',
+                    floor: '1F 남쪽 게시판',
+                    title: '당팡게시판',
+                    text: '간식 당첨과 응원, 칭찬 릴레이가 오가는 당팡게시판 코너입니다.',
+                    pos: new THREE.Vector3(2.8, 0, 7.6),
+                    radius: 3.8
+                },
+                {
+                    id: 'couteria',
+                    badge: '오늘의 식단',
+                    floor: '1F 북쪽 벽면',
+                    title: '쿠테리아 오늘의 식단표',
+                    text: '육식·채식 두 가지 식단 코너의 오늘 메뉴를 한눈에 확인하고 직접 수정할 수 있습니다.',
+                    pos: new THREE.Vector3(4.5, 0, -10.8),
+                    radius: 3.6
                 }
             );
         }
 
         /**
-         * 9. 충돌 박스 등록 및 1층 바닥 경계 계산
+         * 8. 충돌 박스 등록 및 1층 바닥 높이 계산
          */
         function addCollider(minX, maxX, minZ, maxZ, minY, maxY) {
             colliders.push({ minX, maxX, minZ, maxZ, minY, maxY });
         }
 
-        function getWalkableHeight(x, z) {
+        function getWalkableHeight(x, z, currentY) {
             if (x >= -12.6 && x <= 12.6 && z >= -12.6 && z <= 12.6) {
                 return 0;
             }
@@ -1266,10 +1681,13 @@
         }
 
         /**
-         * 10. 키보드, 마우스 드래그 시점, 터치 조이스틱 및 UI 버튼 이벤트
+         * 10. 입력 및 UI 이벤트 설정
          */
         function setupInputsAndUI() {
             window.addEventListener('keydown', (e) => {
+                if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+                    return;
+                }
                 if (e.key in keys) keys[e.key] = true;
                 const lower = e.key.toLowerCase();
                 if (lower in keys) keys[lower] = true;
@@ -1278,6 +1696,85 @@
                 if (e.key in keys) keys[e.key] = false;
                 const lower = e.key.toLowerCase();
                 if (lower in keys) keys[lower] = false;
+            });
+
+            // 게시판 닉네임 + 메시지 입력 등록 처리
+            const boardForm = document.getElementById('board-post-form');
+            const boardListEl = document.getElementById('board-post-list');
+            const cornerSelect = document.getElementById('board-corner-select');
+            const nickInput = document.getElementById('board-nick-input');
+            const msgInput = document.getElementById('board-msg-input');
+            const feedbackEl = document.getElementById('board-post-feedback');
+
+            // 쿠테리아 메뉴 항목 개별 삭제 버튼 처리
+            boardListEl.addEventListener('click', (e) => {
+                const delBtn = e.target.closest('.couteria-del-btn');
+                if (!delBtn || activeLandmarkId !== 'couteria') return;
+                const cIdx = Number(delBtn.dataset.corner);
+                const mIdx = Number(delBtn.dataset.idx);
+                if (boardData.couteria[cIdx] && boardData.couteria[cIdx].items.length > 1) {
+                    boardData.couteria[cIdx].items.splice(mIdx, 1);
+                    redrawCouTeriaMenu();
+                    renderBoardPostList('couteria');
+                    feedbackEl.textContent = '메뉴가 삭제되었습니다.';
+                    feedbackEl.className = 'text-[11px] font-medium text-emerald-700';
+                    setTimeout(() => { feedbackEl.textContent = ''; }, 2000);
+                } else {
+                    feedbackEl.textContent = '코너별 최소 1개 메뉴는 유지됩니다.';
+                    feedbackEl.className = 'text-[11px] font-medium text-rose-600';
+                    setTimeout(() => { feedbackEl.textContent = ''; }, 2000);
+                }
+            });
+
+            boardForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (activeLandmarkId === 'couteria') {
+                    const selectedCorner = cornerSelect.value;
+                    const menuName = msgInput.value.trim();
+                    if (!menuName) {
+                        feedbackEl.textContent = '추가할 메뉴 이름을 입력해 주세요.';
+                        feedbackEl.className = 'text-[11px] font-medium text-rose-600';
+                        return;
+                    }
+                    const targetCorner = boardData.couteria.find(c => c.title === selectedCorner);
+                    if (targetCorner) {
+                        targetCorner.items.unshift(menuName);
+                        redrawCouTeriaMenu();
+                        renderBoardPostList('couteria');
+                    }
+                    msgInput.value = '';
+                    feedbackEl.textContent = '오늘의 식단표에 메뉴가 반영되었습니다!';
+                    feedbackEl.className = 'text-[11px] font-medium text-emerald-700';
+                    setTimeout(() => {
+                        feedbackEl.textContent = '';
+                    }, 2200);
+                    return;
+                }
+
+                const nick = nickInput.value.trim() || '익명사원';
+                const msg = msgInput.value.trim();
+                if (!msg) {
+                    feedbackEl.textContent = '메시지를 입력해 주세요.';
+                    feedbackEl.className = 'text-[11px] font-medium text-rose-600';
+                    return;
+                }
+
+                if (activeLandmarkId === 'blind') {
+                    boardData.blind.unshift({ nick, msg });
+                    redrawBlindBoard();
+                    renderBoardPostList('blind');
+                } else if (activeLandmarkId === 'dangpang') {
+                    boardData.dangpang.unshift({ nick, msg });
+                    redrawDangpangBoard();
+                    renderBoardPostList('dangpang');
+                }
+
+                msgInput.value = '';
+                feedbackEl.textContent = '게시판에 반영되었습니다!';
+                feedbackEl.className = 'text-[11px] font-medium text-emerald-700';
+                setTimeout(() => {
+                    feedbackEl.textContent = '';
+                }, 2200);
             });
 
             const domElem = renderer.domElement;
@@ -1382,6 +1879,7 @@
             }, { passive: true });
             joyZone.addEventListener('touchend', resetJoystick);
 
+            // 발걸음 속도 토글 버튼 ('느린 발걸음' <-> '여유로운 산책' <-> '경쾌한 발걸음')
             const paceBtn = document.getElementById('toggle-pace-btn');
             paceBtn.addEventListener('click', () => {
                 playerState.paceIndex = (playerState.paceIndex + 1) % PACE_MODES.length;
@@ -1409,7 +1907,7 @@
         }
 
         /**
-         * 11. 프레임 업데이트: 플레이어 이동, 애니메이션, 카메라 추적
+         * 11. 프레임 업데이트
          */
         function updatePlayer(dt) {
             let forwardInput = 0;
@@ -1447,17 +1945,17 @@
                 if (heightBoth !== null && !checkCollision(nextX, heightBoth, nextZ)) {
                     playerState.position.x = nextX;
                     playerState.position.z = nextZ;
-                    playerState.position.y = heightBoth;
+                    playerState.position.y = THREE.MathUtils.lerp(playerState.position.y, heightBoth, 0.35);
                 } else {
                     const heightX = getWalkableHeight(nextX, playerState.position.z, playerState.position.y);
                     if (heightX !== null && !checkCollision(nextX, heightX, playerState.position.z)) {
                         playerState.position.x = nextX;
-                        playerState.position.y = heightX;
+                        playerState.position.y = THREE.MathUtils.lerp(playerState.position.y, heightX, 0.35);
                     }
                     const heightZ = getWalkableHeight(playerState.position.x, nextZ, playerState.position.y);
                     if (heightZ !== null && !checkCollision(playerState.position.x, heightZ, nextZ)) {
                         playerState.position.z = nextZ;
-                        playerState.position.y = heightZ;
+                        playerState.position.y = THREE.MathUtils.lerp(playerState.position.y, heightZ, 0.35);
                     }
                 }
 
@@ -1519,9 +2017,6 @@
             camera.lookAt(targetFocus);
         }
 
-        /**
-         * 12. 3D 좌표를 2D 화면 좌표로 변환하여 이름표, NPC 말풍선, 랜드마크 카드 갱신
-         */
         function projectToScreen(worldVec) {
             const v = worldVec.clone().project(camera);
             const width = window.innerWidth;
@@ -1534,7 +2029,6 @@
         }
 
         function updateUIAndInteractions(dt) {
-            // (1) 플레이어 머리 위 이름표 ('NEWBIE') 위치 동기화
             const headTopPos = new THREE.Vector3(
                 playerState.position.x,
                 playerState.position.y + 2.68,
@@ -1550,10 +2044,9 @@
                 playerTag.style.opacity = '0';
             }
 
-            // (2) NPC 사원 근접 시 말풍선 표시
             const elapsed = clock.getElapsedTime();
             npcs.forEach((npc, i) => {
-                npc.head.rotation.y = npc.baseHeadRotY + Math.sin(elapsed * 1.5 + i) * 0.15;
+                npc.head.rotation.y = Math.sin(elapsed * 1.5 + i) * 0.15;
                 npc.timer += dt;
                 if (npc.timer > 5.5) {
                     npc.timer = 0;
@@ -1577,7 +2070,6 @@
                 }
             });
 
-            // (3) 로비 랜드마크 근접 탐방 카드 표시
             let nearestLandmark = null;
             let minLandmarkDist = Infinity;
 
@@ -1590,18 +2082,54 @@
             });
 
             const card = document.getElementById('landmark-card');
+            const boardList = document.getElementById('board-post-list');
+            const boardForm = document.getElementById('board-post-form');
+            const cornerSelect = document.getElementById('board-corner-select');
+            const nickInput = document.getElementById('board-nick-input');
+            const msgInput = document.getElementById('board-msg-input');
+            const submitBtn = document.getElementById('board-submit-btn');
+
             if (nearestLandmark) {
                 card.classList.remove('hidden');
                 document.getElementById('landmark-badge').textContent = nearestLandmark.badge;
                 document.getElementById('landmark-floor').textContent = nearestLandmark.floor;
                 document.getElementById('landmark-title').textContent = nearestLandmark.title;
                 document.getElementById('landmark-text').textContent = nearestLandmark.text;
+
+                if (nearestLandmark.id === 'blind' || nearestLandmark.id === 'dangpang' || nearestLandmark.id === 'couteria') {
+                    if (activeLandmarkId !== nearestLandmark.id) {
+                        document.getElementById('board-post-feedback').textContent = '';
+                        renderBoardPostList(nearestLandmark.id);
+                    }
+                    if (nearestLandmark.id === 'couteria') {
+                        cornerSelect.classList.remove('hidden');
+                        nickInput.classList.add('hidden');
+                        msgInput.placeholder = '추가할 오늘의 메뉴를 입력하세요';
+                        submitBtn.textContent = '메뉴 추가';
+                        submitBtn.className = 'px-3 py-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-lg transition-all cursor-pointer';
+                    } else {
+                        cornerSelect.classList.add('hidden');
+                        nickInput.classList.remove('hidden');
+                        msgInput.placeholder = '게시판에 남길 메시지를 입력하세요';
+                        submitBtn.textContent = '게시글 등록';
+                        submitBtn.className = 'px-3 py-1 bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold rounded-lg transition-all cursor-pointer';
+                    }
+                    activeLandmarkId = nearestLandmark.id;
+                    boardList.classList.remove('hidden');
+                    boardForm.classList.remove('hidden');
+                } else {
+                    activeLandmarkId = nearestLandmark.id;
+                    boardList.classList.add('hidden');
+                    boardForm.classList.add('hidden');
+                }
             } else {
+                activeLandmarkId = null;
                 card.classList.add('hidden');
+                boardList.classList.add('hidden');
+                boardForm.classList.add('hidden');
             }
         }
 
-        // 메인 애니메이션 루프
         function animate() {
             requestAnimationFrame(animate);
             const dt = Math.min(clock.getDelta(), 0.05);
